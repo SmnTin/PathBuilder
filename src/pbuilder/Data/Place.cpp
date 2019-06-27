@@ -6,15 +6,17 @@ namespace pbuilder {
 
     Place::Place(const Coordinates & coords_,
                 std::vector<Interval> intervals_,
-                const TimePoint & timeToGet_)
-                : coords(coords_), timeToGet(timeToGet_) {
+                const TimePoint & timeToGet_,
+                int id_)
+                : coords(coords_), timeToGet(timeToGet_), id(id_) {
         for(auto & item : intervals_)
             intervals.insert(item);
     }
     Place::Place(const Coordinates & coords_,
                 std::set<Interval> intervals_,
-                const TimePoint & timeToGet_)
-                : coords(coords_), timeToGet(timeToGet_), intervals(intervals_) {}
+                const TimePoint & timeToGet_,
+                int id_)
+                : coords(coords_), timeToGet(timeToGet_), intervals(intervals_), id(id_) {}
 
     //get nearest existing interval right after certain time point
     Interval Place::nearestTime(const TimePoint & timePoint) {

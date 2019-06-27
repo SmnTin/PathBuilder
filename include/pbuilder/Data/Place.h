@@ -25,15 +25,18 @@ namespace pbuilder {
 
         Place(const Coordinates & coords_,
                 std::vector<Interval> intervals_,
-                const TimePoint & timeToGet_);
+                const TimePoint & timeToGet_,
+                int id_);
 
         Place(const Coordinates & coords_,
                 std::set<Interval> intervals_,
-                const TimePoint & timeToGet_);
+                const TimePoint & timeToGet_,
+                int id_);
 
         Coordinates coords;
         std::set<Interval> intervals;
         TimePoint timeToGet;
+        int id;
 
         //get nearest existing interval right after certain time point
         Interval nearestTime(const TimePoint & timePoint);
