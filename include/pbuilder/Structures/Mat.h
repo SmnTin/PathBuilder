@@ -56,11 +56,24 @@ namespace pbuilder {
             return _data[row][col];
         }
 
+        static Mat createFromVector(size_t rows_, size_t cols_, const std::vector<T> & vec);
+
     private:
         size_t _rows, _cols;
         std::vector<std::vector<T>> _data;
 
     };
+
+    template <class T>
+    Mat<T> Mat<T>::createFromVector(size_t rows_, size_t cols_, const std::vector<T> & vec) {
+        Mat<T> mat(rows_, cols_);
+
+        for(size_t i = 0; i < rows_; ++i)
+            for(size_t j = 0; j < cols_; ++j)
+                mat.at(i, j) = vec[i*cols_ + j];
+
+        return mat;
+    }
 
     typedef Mat<int> MatInt;
     typedef Mat<unsigned int> MatUInt;

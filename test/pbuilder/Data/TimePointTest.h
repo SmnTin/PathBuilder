@@ -43,6 +43,10 @@ namespace {
 
         EXPECT_LT(i1, i2);
 
+        i2.price = 100;
+
+        EXPECT_EQ(i1, i2);
+
     }
 
     TEST(TimePointTest, ParsingFromString) {

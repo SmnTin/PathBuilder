@@ -60,6 +60,9 @@ namespace pbuilder {
         bool operator<= (const Interval & b) const;
         bool operator> (const Interval & b) const;
         bool operator>= (const Interval & b) const;
+
+        bool operator== (const Interval & b) const;
+        bool operator!= (const Interval & b) const;
     };
 } //pbuilder
 

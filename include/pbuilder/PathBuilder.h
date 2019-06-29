@@ -5,16 +5,25 @@
 #include "pbuilder/Structures/Mat.h"
 #include "pbuilder/Data/Place.h"
 
-class PathBuilder : public PathWorker {
-public:
-    static ShPtr<PathBuilder> createImpl1();
-    static ShPtr<PathBuilder> createImpl2();
+namespace pbuilder {
 
-    virtual void build();
+    class PathBuilder : public PathWorker {
+    public:
+        struct Result {
+            std::vector<ShPtr<Block>> blocks;
+            int price = 0;
+        };
 
-private:
-    PathBuilder () {};
-    ~PathBuilder () {};
-};
+        static ShPtr<PathBuilder> createImpl1();
+//        static ShPtr<PathBuilder> createImpl2();
+
+        virtual void setMaxBlockSize(size_t maxBlockSize) = 0;
+        virtual Result build() = 0;
+
+    protected:
+        PathBuilder() = default;
+        ~PathBuilder() = default;
+    };
+} //pbuilder
 
 #endif //PATHBUILDER_PATHBUILDER_H

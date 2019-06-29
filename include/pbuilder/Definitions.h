@@ -9,6 +9,8 @@ namespace pbuilder {
 
     template <typename T>
     using ShPtr = std::shared_ptr<T>;
+
+    const int PATH_BUILDER_MAX_BLOCK_SIZE = 10;
 }
 
 #endif //PATHBUILDER_DEFS_H

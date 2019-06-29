@@ -141,4 +141,11 @@ namespace pbuilder {
             return lasts > b.lasts;
         return price >= b.price;
     }
+
+    bool Interval::operator== (const Interval & b) const {
+        return !((*this) < b) && !((*this) > b);
+    }
+    bool Interval::operator!= (const Interval & b) const {
+        return ((*this) < b) || ((*this) > b);
+    }
 } //pbuilder
