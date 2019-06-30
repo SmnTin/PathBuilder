@@ -20,8 +20,8 @@ namespace pbuilder {
         static TimePoint fromTimePoint(int timePoint, int startingTime = 0, int interval = 1);
         static TimePoint fromString(
                 std::string timeStr,
-                std::string startingTimeStr,
-                int interval);
+                std::string startingTimeStr = "00:00",
+                int interval=1);
         std::string toString();
 
         int getTime() const;

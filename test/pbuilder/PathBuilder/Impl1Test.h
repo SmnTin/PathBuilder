@@ -1,5 +1,5 @@
-#ifndef PATHBUILDER_PATHBUILDERIMPL1TEST_H
-#define PATHBUILDER_PATHBUILDERIMPL1TEST_H
+#ifndef PATHBUILDER_PATHBUILDER_IMPL1TEST_H
+#define PATHBUILDER_PATHBUILDER_IMPL1TEST_H
 
 #include "gtest/gtest.h"
 
@@ -17,18 +17,22 @@ namespace {
         Interval i3{TimePoint(15),TimePoint(1), 200};
         Interval i4{TimePoint(20),TimePoint(1), 250};
 
-        Place place1(Coordinates{10, 0},
-                     std::vector<Interval>({i1}),
-                     TimePoint(0));
-        Place place2(Coordinates{20, 0},
-                     std::vector<Interval>({i2}),
-                     TimePoint(0));
-        Place place3(Coordinates{30, 0},
-                     std::vector<Interval>({i3}),
-                     TimePoint(0));
-        Place place4(Coordinates{40, 0},
-                     std::vector<Interval>({i4}),
-                     TimePoint(0));
+        PlaceWithTimetable place1(Coordinates{10, 0},
+                                  std::vector<Interval>({i1}),
+                                  TimePoint(0),
+                                  0);
+        PlaceWithTimetable place2(Coordinates{20, 0},
+                                  std::vector<Interval>({i2}),
+                                  TimePoint(0),
+                                  1);
+        PlaceWithTimetable place3(Coordinates{30, 0},
+                                  std::vector<Interval>({i3}),
+                                  TimePoint(0),
+                                  2);
+        PlaceWithTimetable place4(Coordinates{40, 0},
+                                  std::vector<Interval>({i4}),
+                                  TimePoint(0),
+                                  3);
 
         MatInt mat1 = MatInt::createFromVector(4, 4,
                 {0, INF, 1, 1,
@@ -46,10 +50,10 @@ namespace {
         _pathBuilder->setDayEnd(TimePoint(INF));
 
         _pathBuilder->setPlaces({
-            std::make_shared<Place>(place1),
-            std::make_shared<Place>(place2),
-            std::make_shared<Place>(place3),
-            std::make_shared<Place>(place4)
+            std::make_shared<PlaceWithTimetable>(place1),
+            std::make_shared<PlaceWithTimetable>(place2),
+            std::make_shared<PlaceWithTimetable>(place3),
+            std::make_shared<PlaceWithTimetable>(place4)
         });
         _pathBuilder->setMatrices({
             std::make_shared<MatInt>(mat1),
@@ -75,18 +79,22 @@ namespace {
         Interval i3{TimePoint(15),TimePoint(1), 200};
         Interval i4{TimePoint(20),TimePoint(1), 250};
 
-        Place place1(Coordinates{10, 0},
-                     std::vector<Interval>({i1}),
-                     TimePoint(0));
-        Place place2(Coordinates{20, 0},
-                     std::vector<Interval>({i2}),
-                     TimePoint(0));
-        Place place3(Coordinates{30, 0},
-                     std::vector<Interval>({i3}),
-                     TimePoint(0));
-        Place place4(Coordinates{40, 0},
-                     std::vector<Interval>({i4}),
-                     TimePoint(0));
+        PlaceWithTimetable place1(Coordinates{10, 0},
+                                  std::vector<Interval>({i1}),
+                                  TimePoint(0),
+                                  0);
+        PlaceWithTimetable place2(Coordinates{20, 0},
+                                  std::vector<Interval>({i2}),
+                                  TimePoint(0),
+                                  1);
+        PlaceWithTimetable place3(Coordinates{30, 0},
+                                  std::vector<Interval>({i3}),
+                                  TimePoint(0),
+                                  2);
+        PlaceWithTimetable place4(Coordinates{40, 0},
+                                  std::vector<Interval>({i4}),
+                                  TimePoint(0),
+                                  3);
 
         MatInt mat1 = MatInt::createFromVector(4, 4,
                                                {0, INF, 1, 1,
@@ -104,10 +112,10 @@ namespace {
         _pathBuilder->setDayEnd(TimePoint(INF));
 
         _pathBuilder->setPlaces({
-            std::make_shared<Place>(place1),
-            std::make_shared<Place>(place2),
-            std::make_shared<Place>(place3),
-            std::make_shared<Place>(place4)
+            std::make_shared<PlaceWithTimetable>(place1),
+            std::make_shared<PlaceWithTimetable>(place2),
+            std::make_shared<PlaceWithTimetable>(place3),
+            std::make_shared<PlaceWithTimetable>(place4)
         });
         _pathBuilder->setMatrices({
             std::make_shared<MatInt>(mat1),
@@ -133,15 +141,18 @@ namespace {
         Interval i2{TimePoint(10),TimePoint(1), 150};
         Interval i3{TimePoint(15),TimePoint(1), 200};
 
-        Place place1(Coordinates{10, 0},
-                     std::vector<Interval>({i1}),
-                     TimePoint(0));
-        Place place2(Coordinates{20, 0},
-                     std::vector<Interval>({i2}),
-                     TimePoint(0));
-        Place place3(Coordinates{30, 0},
-                     std::vector<Interval>({i3}),
-                     TimePoint(0));
+        PlaceWithTimetable place1(Coordinates{10, 0},
+                                  std::vector<Interval>({i1}),
+                                  TimePoint(0),
+                                  0);
+        PlaceWithTimetable place2(Coordinates{20, 0},
+                                  std::vector<Interval>({i2}),
+                                  TimePoint(0),
+                                  1);
+        PlaceWithTimetable place3(Coordinates{30, 0},
+                                  std::vector<Interval>({i3}),
+                                  TimePoint(0),
+                                  2);
 
         MatInt mat1 = MatInt::createFromVector(3, 3,
                                                {0, INF, 1,
@@ -158,9 +169,9 @@ namespace {
         _pathBuilder->setDayEnd(TimePoint(INF));
 
         _pathBuilder->setPlaces({
-            std::make_shared<Place>(place1),
-            std::make_shared<Place>(place2),
-            std::make_shared<Place>(place3)
+            std::make_shared<PlaceWithTimetable>(place1),
+            std::make_shared<PlaceWithTimetable>(place2),
+            std::make_shared<PlaceWithTimetable>(place3)
         });
         _pathBuilder->setMatrices({
             std::make_shared<MatInt>(mat1),
@@ -184,12 +195,14 @@ namespace {
         Interval i1{TimePoint(5),TimePoint(5), 100};
         Interval i2{TimePoint(10),TimePoint(1), 150};
 
-        Place place1(Coordinates{10, 0},
-                     std::vector<Interval>({i1}),
-                     TimePoint(0));
-        Place place2(Coordinates{20, 0},
-                     std::vector<Interval>({i2}),
-                     TimePoint(0));
+        PlaceWithTimetable place1(Coordinates{10, 0},
+                                  std::vector<Interval>({i1}),
+                                  TimePoint(0),
+                                  0);
+        PlaceWithTimetable place2(Coordinates{20, 0},
+                                  std::vector<Interval>({i2}),
+                                  TimePoint(0),
+                                  1);
 
         MatInt mat1 = MatInt::createFromVector(3, 3,
                                                {0, 1,
@@ -205,8 +218,8 @@ namespace {
         _pathBuilder->setDayEnd(TimePoint(INF));
 
         _pathBuilder->setPlaces({
-            std::make_shared<Place>(place1),
-            std::make_shared<Place>(place2)
+            std::make_shared<PlaceWithTimetable>(place1),
+            std::make_shared<PlaceWithTimetable>(place2)
         });
         _pathBuilder->setMatrices({
             std::make_shared<MatInt>(mat1),
@@ -234,4 +247,4 @@ namespace {
 
 }  // namespace}
 
-#endif //PATHBUILDER_PATHBUILDERIMPL1TEST_H
+#endif //PATHBUILDER_PATHBUILDER_IMPL1TEST_H

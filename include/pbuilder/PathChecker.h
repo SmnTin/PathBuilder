@@ -9,15 +9,19 @@ namespace pbuilder {
 
     class PathChecker : public PathWorker {
     public:
-        static ShPtr<PathBuilder> create();
+        struct Result {
+            bool possible = false;
+            ShPtr<Block> block;
+        };
 
-        virtual void check() = 0;
+        static ShPtr<PathChecker> create();
+
+        virtual Result check() = 0;
 
     protected:
         PathChecker() {};
         ~PathChecker() {};
     };
 }
-
 
 #endif //PATHBUILDER_PATHCHECKER_H

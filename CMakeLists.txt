@@ -45,13 +45,23 @@ endif()
 
 #-------------------------LIBRARIES-------------------------------#
 
+find_library(LIBEVENT2_CORE event_core)
+
 #-------------------------EXECUTABLES-------------------------------#
 
 include_directories(include)
 file(GLOB_RECURSE SRCS
         "src/pbuilder/*.h"
         "src/pbuilder/*.cpp")
+#set(SRCS src/pbuilder/Data/Place.cpp
+#        src/pbuilder/Data/TimePoint.cpp
+#        src/pbuilder/Structures/Mat.cpp
+#        src/pbuilder/Parser/Impl1.cpp
+#        src/pbuilder/PathBuilder/Impl1.cpp
+#        src/pbuilder/PathChecker/Impl1.cpp
+#)
 add_executable(PathBuilder ${SRCS} src/main.cpp)
+target_link_libraries(PathBuilder  ${LIBEVENT2_CORE})
 
 #-------------------------EXECUTABLES/TESTS-------------------------------#
 
@@ -64,6 +74,7 @@ add_executable(test ${SRCS} ${TESTS})
 
 target_link_libraries(test
         gtest_main
+        ${LIBEVENT2_CORE}
 )
 
 add_custom_target(run

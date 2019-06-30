@@ -15,37 +15,70 @@
 namespace pbuilder {
 
     struct Coordinates {
-        int latitude = 0;
-        int longitude = 0;
+        double latitude = 0;
+        double longitude = 0;
     };
 
     double distance(Coordinates p1, Coordinates p2);
 
     class Place {
     public:
-        Place();
-
         typedef int Id;
 
-        Place(const Coordinates & coords_,
-                std::vector<Interval> intervals_,
-                const TimePoint & timeToGet_);
-
-        Place(const Coordinates & coords_,
-                std::set<Interval> intervals_,
-                const TimePoint & timeToGet_);
-
         Coordinates coords;
-        std::set<Interval> intervals;
         TimePoint timeToGet;
+        Id id;
 
         //get nearest existing interval right after certain time point
-        Interval nearestTime(const TimePoint & timePoint);
+        virtual Interval nearestTime(const TimePoint & timePoint) = 0;
 
-        bool operator< (const Place & b) const;
+        virtual bool operator< (const Place & b) const = 0;
 
-    private:
-        bool _anyTime = false;
+    };
+
+
+    class PlaceWithTimetable : public Place {
+    public:
+        PlaceWithTimetable();
+
+        PlaceWithTimetable(const Coordinates & coords_,
+                           std::vector<Interval> intervals_,
+                           const TimePoint & timeToGet_,
+                           Id id_ = 0);
+
+        PlaceWithTimetable(const Coordinates & coords_,
+                           std::set<Interval> intervals_,
+                           const TimePoint & timeToGet_,
+                           Id id_ = 0);
+
+        std::set<Interval> intervals;
+
+        Interval nearestTime(const TimePoint & timePoint) override;
+
+        bool operator< (const Place & b) const override;
+
+    };
+
+    class PlaceWithFreeTime : public Place {
+    public:
+        PlaceWithFreeTime();
+
+        PlaceWithFreeTime(const Coordinates & coords_,
+                          TimePoint visitingStart_,
+                          TimePoint visitingEnd_,
+                          TimePoint visitingDuration_,
+                          int price_,
+                          const TimePoint & timeToGet_,
+                          Id id_= 0);
+
+        TimePoint visitingStart;
+        TimePoint visitingEnd;
+        TimePoint visitingDuration;
+        int price;
+
+        Interval nearestTime(const TimePoint & timePoint) override;
+
+        bool operator< (const Place & b) const override;
 
     };
 

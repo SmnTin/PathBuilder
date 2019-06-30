@@ -21,7 +21,7 @@ namespace pbuilder {
             _maxBlockSize = maxBlockSize;
         }
 
-    private:
+    protected:
         size_t _maxBlockSize = PATH_BUILDER_MAX_BLOCK_SIZE;
 
         int _count(int mask) {
@@ -40,9 +40,11 @@ namespace pbuilder {
 
             for(size_t i = 0; i < n; ++i) {
                 for(size_t j = 0; j < n; ++j) {
-                    //we take corresponding value based on chosen transport (foot-walking or car)
-                    if(_matrices[4]->at(i, j) == 0)
+                    //we take corresponding value based on chosen transport (foot-walking, public-transport or car)
+                    if(_matrices[3]->at(i, j) == 0)
                         _resultedMat->at(i, j) = _matrices[0]->at(i, j);
+                    else if(_matrices[4]->at(i, j) == 1)
+                        _resultedMat->at(i, j) = _matrices[1]->at(i, j);
                     else
                         _resultedMat->at(i, j) = _matrices[2]->at(i, j);
                 }
@@ -85,7 +87,7 @@ namespace pbuilder {
                         for (size_t j = 0; j < n; ++j) {
                             if(i != j && _bit(mask, j)) {
                                 auto interval = place->nearestTime(TimePoint(dp[mask^(1 << i)][j] +
-                                                                             _resultedMat->at(pts[j], pts[i])));
+                                                                             _resultedMat->at(_places[pts[j]]->id, _places[pts[i]]->id)));
 //                                std::cout << mask << " " << i << " " << j << " " << interval.starts.getTimePoint() << " | ";
 //                                std::cout << (mask^(1 << i)) << " " << dp[mask^(1 << i)][j] << " " << _resultedMat->at(pts[j], pts[i]) << "\n";
 
@@ -123,7 +125,7 @@ namespace pbuilder {
                     auto place = std::make_shared<PlaceVisited>();
 
                     place->interval = p_interval[cur_mask][cur_i];
-                    place->id = pts[cur_i];
+                    place->id = _places[pts[cur_i]]->id;
 
                     block->price += place->interval.price;
 
@@ -151,12 +153,12 @@ namespace pbuilder {
         virtual Result _calcResultImpl1() {
             Result result;
 
-            std::queue<Place::Id>
+            std::queue<int>
                     toVisit = _distanceOrderedPlaces(),
                     visited;
 
             while(!toVisit.empty()) {
-                std::vector<Place::Id> places;
+                std::vector<int> places;
                 int mask = 0;
                 int updatedMask = 0;
                 auto block = std::make_shared<Block>();
@@ -217,15 +219,13 @@ namespace pbuilder {
             return result;
         }
 
-        std::queue<Place::Id> _distanceOrderedPlaces() {
-            std::vector<std::pair<double, Place::Id>> order;
-            std::queue<Place::Id> result;
+        std::queue<int> _distanceOrderedPlaces() {
+            std::vector<std::pair<double, int>> order;
+            std::queue<int> result;
 
 
             for(size_t i = 0; i < _places.size(); ++i) {
-                Place::Id id = i;
-
-                order.emplace_back(distance(_places[i]->coords, _coordinates), id);
+                order.emplace_back(distance(_places[i]->coords, _coordinates), i);
             }
 
             std::sort(order.begin(), order.end());
