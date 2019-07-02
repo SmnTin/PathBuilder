@@ -10,25 +10,21 @@ using namespace pbuilder;
 namespace {
 
     TEST(PlaceTest, NearestInterval) {
-        Interval i1{TimePoint(10),TimePoint(5), 100};
-        Interval i2{TimePoint(5),TimePoint(7), 150};
-        Interval i3{TimePoint(12),TimePoint(4), 200};
+        auto el1 = std::make_shared<FixedTimetableElement>(TimePoint(20), TimePoint(10), 100);
+        auto el2 = std::make_shared<FreeTimetableElement>(TimePoint(14), TimePoint(100), TimePoint(15), 50);
 
-        PlaceWithTimetable place1(Coordinates{10, 20},
-                                  std::vector<Interval>({i1, i2, i3}),
+        PlaceWithMixedTimetable place1(Coordinates{10, 20},
                                   TimePoint(5));
+        place1.addTimetableElement(el1, 0);
+        place1.addTimetableElement(el2, 1);
 
-        TimePoint tp1(7), tp2(5), tp3(14);
+        TimePoint tp1(7), tp2(30), tp3(10), tp4(16), tp5(90);
 
-        EXPECT_EQ(place1.nearestTime(tp1).starts, i1.starts);
-        EXPECT_EQ(place1.nearestTime(tp2).starts, i2.starts);
-        EXPECT_EQ(place1.nearestTime(tp3).starts.getTime(), INF);
-
-        PlaceWithFreeTime place2({0,0}, TimePoint(0), TimePoint(INF), TimePoint(30), 0, TimePoint(1), 0);
-        EXPECT_EQ(place2.nearestTime(tp1).starts.getTimePoint(), tp1.getTimePoint());
-
-        PlaceWithFreeTime place3({0,0}, TimePoint(0), TimePoint(40), TimePoint(30), 0, TimePoint(1), 0);
-        EXPECT_EQ(place3.nearestTime(tp3).starts.getTimePoint(), INF);
+        EXPECT_EQ(place1.nearestTime(tp1, 0).starts, TimePoint(20));
+        EXPECT_EQ(place1.nearestTime(tp2, 0).starts, TimePoint(INF));
+        EXPECT_EQ(place1.nearestTime(tp3, 1).starts, TimePoint(14));
+        EXPECT_EQ(place1.nearestTime(tp4, 1).starts, TimePoint(16));
+        EXPECT_EQ(place1.nearestTime(tp5, 1).starts, TimePoint(INF));
 
     }
 

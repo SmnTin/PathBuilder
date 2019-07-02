@@ -13,6 +13,7 @@ namespace pbuilder {
                 FULL=0,
                 ROUTE=1
             } mode = Mode::FULL;
+            int dayOfWeek = 0;
             Coordinates startingPos;
             TimePoint dayStart, dayEnd;
             std::vector<ShPtr<MatInt>> matrices;

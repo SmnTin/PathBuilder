@@ -12,10 +12,17 @@ namespace pbuilder {
     class PathWorker {
     public:
 
+        struct Transport {
+            bool possible = false;
+            int takesMinutes = 0;
+        };
+
         struct PlaceVisited {
             typedef Place::Id Id;
             Id id = 0;
             Interval interval;
+            std::vector<Transport> transports;
+            size_t chosenTransport = 0;
         };
 
         struct Block {
@@ -39,17 +46,24 @@ namespace pbuilder {
 
         virtual void setMatrices(const std::vector <ShPtr<MatInt>> &matrices) {
             _matrices = matrices;
+            numberOfTransports = (size_t)std::max(0, (int)_matrices.size() - 1);
         };
 
         virtual void setStartingPos(const Coordinates &coordinates) {
             _coordinates = coordinates;
         };
 
+        virtual void setDayOfWeek(int dayOfWeek = 0) {
+            _dayOfWeek = dayOfWeek;
+        }
+
     protected:
         std::vector <ShPtr<Place>> _places;
         TimePoint _dayStart, _dayEnd;
         std::vector <ShPtr<MatInt>> _matrices;
+        size_t numberOfTransports = 0;
         Coordinates _coordinates;
+        int _dayOfWeek = 0;
     };
 } //pbuilder
 

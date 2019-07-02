@@ -34,25 +34,41 @@ namespace pbuilder {
 
         ShPtr<MatInt> _resultedMat;
 
-        virtual void _prepareInput() {
-            size_t n = _places.size();
+        std::vector<Place::Id> _unvisited;
+
+        void _prepareInput() {
+            _preparePlaces();
+            _prepareMatrices();
+        }
+
+        void _preparePlaces() {
+            std::vector<ShPtr<Place>> newPlaces;
+
+            for(auto & place : _places) {
+                if(!place->visitable(_dayStart, _dayEnd)) {
+                    _unvisited.push_back(place->id);
+                } else {
+                    newPlaces.push_back(place);
+                }
+            }
+
+            _places = newPlaces;
+        }
+
+        void _prepareMatrices() {
+            size_t n = _matrices[0]->cols();
             _resultedMat = std::make_shared<MatInt>(n, n, INF);
 
             for(size_t i = 0; i < n; ++i) {
                 for(size_t j = 0; j < n; ++j) {
                     //we take corresponding value based on chosen transport (foot-walking, public-transport or car)
-                    if(_matrices[3]->at(i, j) == 0)
-                        _resultedMat->at(i, j) = _matrices[0]->at(i, j);
-                    else if(_matrices[4]->at(i, j) == 1)
-                        _resultedMat->at(i, j) = _matrices[1]->at(i, j);
-                    else
-                        _resultedMat->at(i, j) = _matrices[2]->at(i, j);
+                    _resultedMat->at(i, j) = _matrices[_matrices[numberOfTransports]->at(i, j)]->at(i, j);
                 }
             }
         }
 
         //the "core" function. It calculates an optimal route through all given vertices;
-        virtual ShPtr<Block> _hamilton(const std::vector<Place::Id> & pts, int savedMask = 0) {
+        ShPtr<Block> _hamilton(const std::vector<Place::Id> & pts, int dayOfWeek, int savedMask = 0) {
 
             size_t n = pts.size();
             int M = (1 << n);
@@ -79,20 +95,25 @@ namespace pbuilder {
                         continue;
                     } else if(_count(mask) == 1) {
                         // base case
-                        p_interval[mask][i] = place->nearestTime(_dayStart + place->timeToGet);
+                        p_interval[mask][i] = place->nearestTime(_dayStart + place->timeToGet, dayOfWeek);
                         dp[mask][i] = (p_interval[mask][i].starts +
                                        p_interval[mask][i].lasts).getTimePoint();
                     } else {
                         //on that step we are trying to build a transition from smaller subset of pts to the current through the edge (j, i)
                         for (size_t j = 0; j < n; ++j) {
                             if(i != j && _bit(mask, j)) {
-                                auto interval = place->nearestTime(TimePoint(dp[mask^(1 << i)][j] +
-                                                                             _resultedMat->at(_places[pts[j]]->id, _places[pts[i]]->id)));
+                                auto interval = place->nearestTime(
+                                        TimePoint(dp[mask^(1 << i)][j] +
+                                                          _resultedMat->at(_places[pts[j]]->id, _places[pts[i]]->id)),
+                                        dayOfWeek);
 //                                std::cout << mask << " " << i << " " << j << " " << interval.starts.getTimePoint() << " | ";
 //                                std::cout << (mask^(1 << i)) << " " << dp[mask^(1 << i)][j] << " " << _resultedMat->at(pts[j], pts[i]) << "\n";
 
                                 int res = (interval.starts +
                                            interval.lasts).getTimePoint();
+
+                                if(res > _dayEnd.getTimePoint())
+                                    res = INF;
 
                                 if(TimePoint(res) <= _dayEnd && res < dp[mask][i] && (cnt < _count(savedMask) || (mask&savedMask)==savedMask)) {
                                     dp[mask][i] = res;
@@ -145,19 +166,22 @@ namespace pbuilder {
             return block;
         }
 
-        virtual Result _calcResult() {
+        Result _calcResult() {
             //TODO: impl2
             return _calcResultImpl1();
         }
 
-        virtual Result _calcResultImpl1() {
+        Result _calcResultImpl1() {
             Result result;
 
+            int dayOfWeek = _dayOfWeek;
             std::queue<int>
-                    toVisit = _distanceOrderedPlaces(),
+                    toVisit = _orderedPlaces(dayOfWeek),
                     visited;
 
             while(!toVisit.empty()) {
+                toVisit = _orderedPlaces(toVisit, dayOfWeek);
+
                 std::vector<int> places;
                 int mask = 0;
                 int updatedMask = 0;
@@ -193,7 +217,7 @@ namespace pbuilder {
                     }
 
                     //apply DP algorithm to find optimal route
-                    auto curBlock = _hamilton(places, mask);
+                    auto curBlock = _hamilton(places, dayOfWeek, mask);
                     mask = curBlock->mask;
                     block = curBlock;
                 }
@@ -214,26 +238,49 @@ namespace pbuilder {
                     toVisit.push(visited.front());
                     visited.pop();
                 }
+
+                //move to the next day of a week
+                dayOfWeek++;
+                dayOfWeek%=DAYS_IN_WEEK;
             }
 
+            result.unvisited = _unvisited;
             return result;
         }
 
-        std::queue<int> _distanceOrderedPlaces() {
-            std::vector<std::pair<double, int>> order;
+        std::queue<int> _orderedPlaces(std::vector<int> pts, int dayOfWeek) {
+            std::vector<std::tuple<int, double, int>> order;
             std::queue<int> result;
 
-
-            for(size_t i = 0; i < _places.size(); ++i) {
-                order.emplace_back(distance(_places[i]->coords, _coordinates), i);
+            for(size_t i = 0; i < pts.size(); ++i) {
+                order.emplace_back(_places[pts[i]]->daysOfWeekComparator(dayOfWeek, (dayOfWeek+1)%DAYS_IN_WEEK),
+                                   distance(_places[pts[i]]->coords, _coordinates), pts[i]);
             }
 
             std::sort(order.begin(), order.end());
 
-            for(size_t i = 0; i < _places.size(); ++i)
-                result.push(order[i].second);
+            for(size_t i = 0; i < pts.size(); ++i)
+                result.push(std::get<2>(order[i]));
 
             return result;
+        }
+
+        std::queue<int> _orderedPlaces(std::queue<int> ptsq, int dayOfWeek) {
+            std::vector<int> pts;
+            while(!ptsq.empty()) {
+                pts.push_back(ptsq.front());
+                ptsq.pop();
+            }
+
+            return _orderedPlaces(pts, dayOfWeek);
+        }
+
+        std::queue<int> _orderedPlaces(int dayOfWeek) {
+            std::vector<int> pts;
+            for(size_t i = 0; i < _places.size(); ++i)
+                pts.push_back(i);
+
+            return _orderedPlaces(pts, dayOfWeek);
         }
 
     };

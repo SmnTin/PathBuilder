@@ -21,86 +21,90 @@ namespace pbuilder {
         return d;
     }
 
-    PlaceWithTimetable::PlaceWithTimetable() {}
+    PlaceWithMixedTimetable::PlaceWithMixedTimetable() = default;
 
-    PlaceWithTimetable::PlaceWithTimetable(const Coordinates & coords_,
-                                           std::vector<Interval> intervals_,
+    PlaceWithMixedTimetable::PlaceWithMixedTimetable(const Coordinates & coords_,
                                            const TimePoint & timeToGet_,
                                            Id id_) {
         id = id_;
         coords = coords_;
         timeToGet = timeToGet_;
-        for(auto & item : intervals_)
-            intervals.insert(item);
-    }
-    PlaceWithTimetable::PlaceWithTimetable(const Coordinates & coords_,
-                                           std::set<Interval> intervals_,
-                                           const TimePoint & timeToGet_,
-                                           Id id_)
-                : intervals(std::move(intervals_)) {
-        id = id_;
-        coords = coords_;
-        timeToGet = timeToGet_;
+
+        _timetable.assign(DAYS_IN_WEEK, std::vector<ShPtr<TimetableElement>>());
     }
 
     //get nearest existing interval right after certain time point
-    Interval PlaceWithTimetable::nearestTime(const TimePoint & timePoint) {
-        Interval interval;
-        interval.starts = timePoint;
+    Interval PlaceWithMixedTimetable::nearestTime(const TimePoint & timePoint, int dayOfWeek) const {
+        Interval result;
+        result.starts = TimePoint(INF);
 
-        //binary search
-        auto it = intervals.lower_bound(interval);
-        if (it == intervals.end()) {
-            //in case we found nothing appropriate
-            Interval badInterval;
-            badInterval.starts = TimePoint(INF);
+        for(auto & elPtr : _timetable[dayOfWeek])
+            result = std::min(result, elPtr->nearestTime(timePoint));
 
-            return badInterval;
-        }
-        return *it;
-
+        return result;
     }
 
-    bool PlaceWithTimetable::operator<(const Place &b) const {
-        return timeToGet < b.timeToGet;
+    void PlaceWithMixedTimetable::addTimetableElement(ShPtr<pbuilder::TimetableElement> element, int dayOfWeek) {
+        _timetable[dayOfWeek].push_back(element);
     }
 
-    PlaceWithFreeTime::PlaceWithFreeTime(const pbuilder::Coordinates &coords_,
-                                         pbuilder::TimePoint visitingStart_,
-                                         pbuilder::TimePoint visitingEnd_,
-                                         pbuilder::TimePoint visitingDuration_,
-                                         int price_,
-                                         const pbuilder::TimePoint &timeToGet_,
-                                         pbuilder::Place::Id id_) {
-        coords = coords_;
-        timeToGet = timeToGet_;
-        price = price_;
-        id = id_;
-        visitingStart = visitingStart_;
-        visitingDuration = visitingDuration_;
-        visitingEnd = visitingEnd_;
-    }
-
-    PlaceWithFreeTime::PlaceWithFreeTime() = default;
-
-    Interval PlaceWithFreeTime::nearestTime(const pbuilder::TimePoint &timePoint) {
-        if(timePoint >= visitingStart && timePoint <= visitingEnd - visitingDuration) {
-            Interval interval;
-
-            interval.starts = timePoint;
-            interval.lasts = visitingDuration;
-            interval.price = price;
-            return interval;
-        } else {
-            Interval badInterval;
-            badInterval.starts = TimePoint(INF);
-
-            return badInterval;
-        }
-    }
-
-    bool PlaceWithFreeTime::operator<(const pbuilder::Place &b) const {
+    bool PlaceWithMixedTimetable::operator<(const Place &b) const {
         return id < b.id;
+    }
+
+    bool PlaceWithMixedTimetable::visitable(TimePoint dayStart, TimePoint dayEnd) const {
+        for(int dayOfWeek = 0; dayOfWeek < DAYS_IN_WEEK; dayOfWeek++) {
+            auto interval = nearestTime(dayStart + timeToGet, dayOfWeek);
+            if(interval.starts + interval.lasts < dayEnd)
+                return true;
+        }
+        return false;
+    }
+
+    FixedTimetableElement::FixedTimetableElement(TimePoint starts_, TimePoint lasts_, int price_) {
+        starts = starts_;
+        lasts = lasts_;
+        price = price_;
+    }
+
+    Interval FixedTimetableElement::nearestTime(const TimePoint &timePoint) const {
+        if(timePoint > starts) {
+            Interval badInterval;
+            badInterval.starts = TimePoint(INF);
+            return badInterval;
+        } else {
+            Interval result;
+            result.starts = starts;
+            result.lasts = lasts;
+            result.price = price;
+            return result;
+        }
+    }
+
+    FreeTimetableElement::FreeTimetableElement(TimePoint starts_, TimePoint ends_,
+                                               TimePoint lasts_, int price_) {
+        starts = starts_;
+        lasts = lasts_;
+        ends = ends_;
+        price = price_;
+    }
+
+    Interval FreeTimetableElement::nearestTime(const TimePoint &timePoint) const {
+        if(timePoint > ends - lasts) {
+            Interval badInterval;
+            badInterval.starts = TimePoint(INF);
+            return badInterval;
+        } else {
+            Interval result;
+            result.starts = std::max(timePoint, starts);
+            result.lasts = lasts;
+            result.price = price;
+            return result;
+        }
+    }
+
+    bool PlaceWithMixedTimetable::daysOfWeekComparator(int dayA, int dayB) const {
+        return _timetable[dayA].size() < _timetable[dayB].size();
     }
 
 } //pbuilder

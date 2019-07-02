@@ -7,7 +7,30 @@ namespace pbuilder {
         Result check() override {
             _prepareInput();
 
-            return _calcResult();
+            auto result = _check();
+
+            if(result.possible) {
+                //adding transport variations
+                for(size_t i = 0; i + 1 < _places.size(); ++i) {
+                    auto & place = result.block->order[i];
+                    auto & nextPlace = result.block->order[i+1];
+
+                    place->transports.assign(numberOfTransports, Transport());
+                    place->chosenTransport = _matrices[numberOfTransports]->at(place->id, nextPlace->id);
+                    for(size_t j = 0; j < numberOfTransports; ++j) {
+                        place->transports[j].takesMinutes = _matrices[j]->at(place->id, nextPlace->id);
+                        _resultedMat->at(place->id, nextPlace->id) = _matrices[j]->at(place->id, nextPlace->id);
+
+                        auto curResult = _check();
+
+                        if(curResult.possible)
+                            place->transports[j].possible = true;
+                    }
+
+                }
+            }
+
+            return result;
         }
 
     protected:
@@ -15,21 +38,18 @@ namespace pbuilder {
         ShPtr<MatInt> _resultedMat;
 
         virtual void _prepareInput() {
-            size_t n = _places.size();
+            size_t n = _matrices[0]->cols();
             _resultedMat = std::make_shared<MatInt>(n, n, INF);
 
             for(size_t i = 0; i < n; ++i) {
                 for(size_t j = 0; j < n; ++j) {
-                    //we take corresponding value based on chosen transport (foot-walking or car)
-                    if(_matrices[4]->at(i, j) == 0)
-                        _resultedMat->at(i, j) = _matrices[0]->at(i, j);
-                    else
-                        _resultedMat->at(i, j) = _matrices[2]->at(i, j);
+                    //we take corresponding value based on chosen transport (foot-walking, public-transport or car)
+                    _resultedMat->at(i, j) = _matrices[_matrices[numberOfTransports]->at(i, j)]->at(i, j);
                 }
             }
         }
 
-        virtual Result _calcResult() {
+        virtual Result _check() {
             TimePoint currentTime = _dayStart;
             Result result;
             result.block = std::make_shared<Block>();
@@ -42,10 +62,10 @@ namespace pbuilder {
                     currentTime = currentTime + TimePoint(_resultedMat->at(_places[i-1]->id, _places[i]->id));
                 }
 
-                auto interval = _places[i]->nearestTime(currentTime);
+                auto interval = _places[i]->nearestTime(currentTime, _dayOfWeek);
                 currentTime = interval.starts + interval.lasts;
 
-                if(currentTime.getTimePoint() >= INF) {
+                if(currentTime.getTimePoint() >= _dayEnd.getTimePoint()) {
                     result.possible = false;
                     break;
                 }

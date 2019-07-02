@@ -10,6 +10,15 @@ namespace pbuilder {
             result.matrices = _parseMatrices(json);
             result.places = _parsePlaces(json);
 
+            result.dayOfWeek = 0;
+            for(int dayOfWeek = 0; dayOfWeek < DAYS_IN_WEEK; ++dayOfWeek) {
+                std::string dayOfWeekStr = json["day_of_week"];
+                if(dayOfWeekStr == DAYS_OF_WEEK_STR[dayOfWeek]) {
+                    result.dayOfWeek = dayOfWeek;
+                    break;
+                }
+            }
+
             if(json["mode"] == "route")
                 result.mode = Result::Mode::ROUTE;
             else
@@ -48,8 +57,6 @@ namespace pbuilder {
             for(nlohmann::json::iterator it = arr.begin(); it != arr.end(); ++it) {
                 nlohmann::json & objJson = *it;
 
-                ShPtr<Place> place;
-
                 Coordinates coords;
                 coords.latitude = objJson["coords"]["lat"];
                 coords.longitude = objJson["coords"]["long"];
@@ -60,30 +67,37 @@ namespace pbuilder {
 
                 auto timeToGet = TimePoint::fromString(objJson["time_to_get"]);
 
-                if(objJson.count("interval")) {
-                    auto starts = TimePoint::fromString(objJson["interval"]["starts"]);
-                    auto ends = TimePoint::fromString(objJson["interval"]["ends"]);
-                    auto lasts = TimePoint::fromString(objJson["interval"]["lasts"]);
-                    int price = objJson["interval"]["price"];
+                ShPtr<PlaceWithMixedTimetable> place = std::make_shared<PlaceWithMixedTimetable>(coords, timeToGet, id);
 
-                    place = std::make_shared<PlaceWithFreeTime>(coords, starts, ends, lasts, price, timeToGet, id);
-                } else {
-                    std::vector<Interval> intervals;
-                    for(nlohmann::json::iterator it2 = objJson["time_points"].begin(); it2 != objJson["time_points"].end(); ++it2) {
-                        auto starts = TimePoint::fromString((*it2)["starts"]);
-                        auto lasts = TimePoint::fromString((*it2)["lasts"]);
-                        int price = (*it2)["price"];
+                for(size_t dayOfWeek = 0; dayOfWeek < DAYS_IN_WEEK; dayOfWeek++) {
+                    if (objJson["timetable"].count(DAYS_OF_WEEK_STR[dayOfWeek])) {
+                        auto &dayJson = objJson["timetable"][DAYS_OF_WEEK_STR[dayOfWeek]];
 
-                        Interval i;
-                        i.starts = starts;
-                        i.lasts = lasts;
-                        i.price = price;
+                        for (nlohmann::json::iterator it2 = dayJson.begin(); it2 != dayJson.end(); ++it2) {
+                            auto &timetableEl = *it2;
+                            if (timetableEl["type"] == "time_point") {
+                                auto starts = TimePoint::fromString(timetableEl["starts"]);
+                                auto lasts = TimePoint::fromString(timetableEl["lasts"]);
+                                int price = timetableEl["price"];
 
-                        intervals.push_back(i);
+                                place->addTimetableElement(
+                                        std::make_shared<FixedTimetableElement>(starts, lasts, price),
+                                        dayOfWeek);
+                            } else if (timetableEl["type"] == "interval") {
+                                auto starts = TimePoint::fromString(timetableEl["starts"]);
+                                auto ends = TimePoint::fromString(timetableEl["ends"]);
+                                auto lasts = TimePoint::fromString(timetableEl["lasts"]);
+                                int price = timetableEl["price"];
+
+                                place->addTimetableElement(
+                                        std::make_shared<FreeTimetableElement>(starts, ends, lasts, price),
+                                        dayOfWeek);
+                            }
+
+                        }
                     }
-
-                    place = std::make_shared<PlaceWithTimetable>(coords, intervals, timeToGet, id);
                 }
+
                 res.push_back(place);
                 ++ind;
             }

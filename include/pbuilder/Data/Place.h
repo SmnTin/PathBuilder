@@ -29,57 +29,62 @@ namespace pbuilder {
         TimePoint timeToGet;
         Id id;
 
+        virtual bool visitable(TimePoint dayStart, TimePoint dayEnd) const = 0;
         //get nearest existing interval right after certain time point
-        virtual Interval nearestTime(const TimePoint & timePoint) = 0;
+        virtual Interval nearestTime(const TimePoint & timePoint, int dayOfWeek) const = 0;
+        virtual bool daysOfWeekComparator(int dayA, int dayB) const = 0;
 
         virtual bool operator< (const Place & b) const = 0;
 
     };
 
-
-    class PlaceWithTimetable : public Place {
+    class TimetableElement {
     public:
-        PlaceWithTimetable();
-
-        PlaceWithTimetable(const Coordinates & coords_,
-                           std::vector<Interval> intervals_,
-                           const TimePoint & timeToGet_,
-                           Id id_ = 0);
-
-        PlaceWithTimetable(const Coordinates & coords_,
-                           std::set<Interval> intervals_,
-                           const TimePoint & timeToGet_,
-                           Id id_ = 0);
-
-        std::set<Interval> intervals;
-
-        Interval nearestTime(const TimePoint & timePoint) override;
-
-        bool operator< (const Place & b) const override;
-
+        virtual Interval nearestTime(const TimePoint & timePoint) const = 0;
     };
 
-    class PlaceWithFreeTime : public Place {
+    class FixedTimetableElement : public TimetableElement {
     public:
-        PlaceWithFreeTime();
+        FixedTimetableElement(TimePoint starts_,
+                              TimePoint lasts_,
+                              int price_);
 
-        PlaceWithFreeTime(const Coordinates & coords_,
-                          TimePoint visitingStart_,
-                          TimePoint visitingEnd_,
-                          TimePoint visitingDuration_,
-                          int price_,
-                          const TimePoint & timeToGet_,
-                          Id id_= 0);
-
-        TimePoint visitingStart;
-        TimePoint visitingEnd;
-        TimePoint visitingDuration;
+        TimePoint starts, lasts;
         int price;
 
-        Interval nearestTime(const TimePoint & timePoint) override;
+        Interval nearestTime(const TimePoint & timePoint) const override;
+    };
+
+    class FreeTimetableElement : public TimetableElement {
+    public:
+        FreeTimetableElement(TimePoint starts_,
+                              TimePoint ends_,
+                              TimePoint lasts_,
+                              int price_);
+
+        TimePoint starts, ends, lasts;
+        int price;
+
+        Interval nearestTime(const TimePoint & timePoint) const override;
+    };
+
+    class PlaceWithMixedTimetable : public Place {
+    public:
+        PlaceWithMixedTimetable();
+
+        PlaceWithMixedTimetable(const Coordinates & coords_,
+                           const TimePoint & timeToGet_,
+                           Id id_ = 0);
+
+        void addTimetableElement(ShPtr<TimetableElement> element, int dayOfWeek);
+        bool visitable(TimePoint dayStart, TimePoint dayEnd) const override;
+        Interval nearestTime(const TimePoint & timePoint, int dayOfWeek) const override;
+        bool daysOfWeekComparator(int dayA, int dayB) const override;
 
         bool operator< (const Place & b) const override;
 
+    private:
+        std::vector<std::vector<ShPtr<TimetableElement>>> _timetable;
     };
 
 } //pbuilder

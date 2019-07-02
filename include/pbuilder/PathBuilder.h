@@ -11,6 +11,7 @@ namespace pbuilder {
     public:
         struct Result {
             std::vector<ShPtr<Block>> blocks;
+            std::vector<Place::Id> unvisited;
             int price = 0;
         };
 

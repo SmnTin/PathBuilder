@@ -33,10 +33,20 @@ namespace pbuilder {
 
         ShPtr<OutputGenerator> _runFullMode(Parser::Result & parsedInput) {
             auto pathBuilder = PathBuilder::createImpl1();
+            auto pathCompleter = PathChecker::create();
 
             _setInput(pathBuilder, parsedInput);
+            _setInput(pathCompleter, parsedInput);
 
             auto output = pathBuilder->build();
+            for(auto & block : output.blocks) {
+                std::vector<ShPtr<Place>> filteredPlaces;
+                for(auto & placeVisited : block->order) {
+                    filteredPlaces.push_back(parsedInput.places[placeVisited->id]);
+                }
+                pathCompleter->setPlaces(filteredPlaces);
+                block = pathCompleter->check().block;
+            }
             return OutputGeneratorFullMode::create(output);
         }
 
@@ -55,6 +65,7 @@ namespace pbuilder {
             pathWorker->setDayEnd(parsedInput.dayEnd);
             pathWorker->setMatrices(parsedInput.matrices);
             pathWorker->setPlaces(parsedInput.places);
+            pathWorker->setDayOfWeek(parsedInput.dayOfWeek);
         }
     };
 

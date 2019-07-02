@@ -19,29 +19,29 @@ namespace {
             },
             "day_start": "9:00",
             "day_end": "23:00",
+            "day_of_week": "monday",
             "places": [{
                 "coords": {
                     "lat": 111,
                     "long": 222
                 },
-                "interval": {
-                    "starts": "9:00",
-                    "ends": "18:00",
-                    "lasts": "1:00",
-                    "price": 150
-                },
-                "time_to_get": "1:00"
-            },
-            {
-                "coords": {
-                    "lat": 111,
-                    "long": 300
-                },
-                "time_points": [{
-                    "starts": "9:00",
-                    "lasts": "1:00",
-                    "price": 150
-                }],
+                "timetable": {
+                    "monday": [
+                      {
+                        "type": "interval",
+                        "starts": "9:00",
+                        "ends": "18:00",
+                        "lasts": "1:00",
+                        "price": 150
+                      },
+                      {
+                        "type": "time_point",
+                        "starts": "9:00",
+                        "lasts": "1:00",
+                        "price": 150
+                      }
+                    ]
+                  },
                 "time_to_get": "1:00"
             }],
             "matrices": [
@@ -70,7 +70,8 @@ namespace {
         ASSERT_EQ(result.dayStart.getTimePoint(), TimePoint(9*60).getTimePoint());
         ASSERT_EQ(result.dayEnd.getTimePoint(), TimePoint(23*60).getTimePoint());
 
-        ASSERT_EQ(result.places.size(), 2);
+        ASSERT_EQ(result.places.size(), 1);
+        ASSERT_EQ(result.dayOfWeek, 0);
     }
 
 }
