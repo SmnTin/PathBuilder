@@ -46,6 +46,7 @@ endif()
 #-------------------------LIBRARIES-------------------------------#
 
 find_library(LIBEVENT2_CORE event_core)
+add_subdirectory(include/SimpleWeb)
 
 #-------------------------EXECUTABLES-------------------------------#
 
@@ -61,7 +62,7 @@ file(GLOB_RECURSE SRCS
 #        src/pbuilder/PathChecker/Impl1.cpp
 #)
 add_executable(PathBuilder ${SRCS} src/main.cpp)
-target_link_libraries(PathBuilder  ${LIBEVENT2_CORE})
+target_link_libraries(PathBuilder  ${LIBEVENT2_CORE} simple-web-server)
 
 #-------------------------EXECUTABLES/TESTS-------------------------------#
 

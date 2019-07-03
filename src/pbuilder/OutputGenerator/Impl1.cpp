@@ -53,7 +53,7 @@ namespace pbuilder {
                 json["unvisited"].push_back(unvisitedPlace);
             }
 
-            return json.dump();
+            return json.dump(4);
         }
 
     private:
@@ -77,7 +77,7 @@ namespace pbuilder {
             if(_output.possible)
                 json["day"] = generateBlockJson(_output.block);
 
-            return json.dump();
+            return json.dump(4);
         }
 
     private:

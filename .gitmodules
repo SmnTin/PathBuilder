@@ -1,0 +1,3 @@
+[submodule "Simple-Web-Server"]
+	path = include/SimpleWeb
+	url = https://gitlab.com/eidheim/Simple-Web-Server
