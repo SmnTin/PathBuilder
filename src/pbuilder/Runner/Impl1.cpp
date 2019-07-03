@@ -39,14 +39,16 @@ namespace pbuilder {
             _setInput(pathCompleter, parsedInput);
 
             auto output = pathBuilder->build();
-//            for(auto & block : output.blocks) {
-//                std::vector<ShPtr<Place>> filteredPlaces;
-//                for(auto & placeVisited : block->order) {
-//                    filteredPlaces.push_back(parsedInput.places[placeVisited->id]);
-//                }
-//                pathCompleter->setPlaces(filteredPlaces);
-//                block = pathCompleter->check().block;
-//            }
+            for(auto & block : output.blocks) {
+                std::vector<ShPtr<Place>> filteredPlaces;
+                for(auto & placeVisited : block->order) {
+                    filteredPlaces.push_back(parsedInput.places[placeVisited->id]);
+                }
+                pathCompleter->setPlaces(filteredPlaces);
+                pathCompleter->setDayOfWeek(block->dayOfWeek);
+
+                block = pathCompleter->check().block;
+            }
             return OutputGeneratorFullMode::create(output);
         }
 

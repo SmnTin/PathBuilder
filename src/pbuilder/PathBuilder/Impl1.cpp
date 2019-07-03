@@ -136,6 +136,8 @@ namespace pbuilder {
 
             //retrieving result
             auto block = std::make_shared<Block>();
+            block->dayOfWeek = dayOfWeek;
+
             if(max_val > 0) {
                 int cur_mask = min_mask[max_val];
                 int cur_i = min_i[max_val];

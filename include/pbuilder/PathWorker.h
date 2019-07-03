@@ -28,6 +28,7 @@ namespace pbuilder {
         struct Block {
             int price = 0;
             int mask = 0;
+            int dayOfWeek = 0;
             std::vector<ShPtr<PlaceVisited>> order;
         };
 
