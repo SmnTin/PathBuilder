@@ -6,7 +6,7 @@ using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
 
 int main() {
     HttpServer server;
-    server.config.port = 8080;
+    server.config.port = 9005;
     server.config.thread_pool_size = 4;
     server.config.timeout_content = 10;
 
