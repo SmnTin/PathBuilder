@@ -45,7 +45,6 @@ endif()
 
 #-------------------------LIBRARIES-------------------------------#
 
-find_library(LIBEVENT2_CORE event_core)
 add_subdirectory(include/SimpleWeb)
 
 #-------------------------EXECUTABLES-------------------------------#
@@ -62,7 +61,7 @@ file(GLOB_RECURSE SRCS
 #        src/pbuilder/PathChecker/Impl1.cpp
 #)
 add_executable(PathBuilder ${SRCS} src/main.cpp)
-target_link_libraries(PathBuilder  ${LIBEVENT2_CORE} simple-web-server)
+target_link_libraries(PathBuilder simple-web-server)
 
 #-------------------------EXECUTABLES/TESTS-------------------------------#
 
@@ -75,7 +74,6 @@ add_executable(tests ${SRCS} ${TESTS})
 
 target_link_libraries(tests
         gtest_main
-        ${LIBEVENT2_CORE}
 )
 
 add_custom_target(run
