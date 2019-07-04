@@ -13,16 +13,21 @@ For instance, on Ubuntu/Debian type the following into the terminal :
 ```bash
 sudo apt-get install libboost-all-dev
 ```
+And you also need CMake and G++ compiler to build the project.
+On Ubuntu/Debian:
+```Shell
+sudo apt-get install build-essential
+```
 
 ### Installation
 Firstly, clone the repo and submodules.
 ```bash
 git clone https://github.com/SmnTin/PathBuilder
-git submodule update
 cd PathBuilder/
+git submodule update
 ```
 Then configure the build.
-```bash
+```Shell
 mkdir build
 cd build
 cmake ..
@@ -35,7 +40,7 @@ make -j4
 ## Usage
 ### Executing
 Inside the *build* directory run **PathBuilder** executable.
-```bash
+```Shell
 ./PathBuilder
 ```
 Then it would be available on the http://localhost:9005
@@ -125,7 +130,7 @@ Then it would be available on the http://localhost:9005
 
 ## Testing
 If you want to see if it passes tests, run the following inside the *build* directory:
-```bash
+```Shell
 ./tests
 ```
 
