@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.11)
+cmake_minimum_required(VERSION 3.0.0)
 project(PathBuilder)
 
 set(CMAKE_CXX_STANDARD 14)
@@ -71,19 +71,19 @@ file(GLOB_RECURSE TESTS
         "test/*.cpp"
 )
 
-add_executable(test ${SRCS} ${TESTS})
+add_executable(tests ${SRCS} ${TESTS})
 
-target_link_libraries(test
+target_link_libraries(tests
         gtest_main
         ${LIBEVENT2_CORE}
 )
 
 add_custom_target(run
         COMMAND test
-        DEPENDS test
+        DEPENDS tests
         WORKING_DIRECTORY ${CMAKE_PROJECT_DIR}
 )
 
 #-------------------------EXECUTABLES/TESTS-------------------------------#
 
-install(TARGETS PathBuilder test DESTINATION bin)
+install(TARGETS PathBuilder tests DESTINATION bin)

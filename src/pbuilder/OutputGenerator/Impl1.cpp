@@ -8,6 +8,7 @@ namespace pbuilder {
         nlohmann::json jday;
         jday["price"] = block->price;
         jday["places"] = nlohmann::json::array();
+        jday["day_of_week"] = DAYS_OF_WEEK_STR[block->dayOfWeek];
 
         for(auto & place : block->order) {
             nlohmann::json jplace;

@@ -53,6 +53,7 @@ namespace pbuilder {
             TimePoint currentTime = _dayStart;
             Result result;
             result.block = std::make_shared<Block>();
+            result.block->dayOfWeek = _dayOfWeek;
             result.possible = true;
 
             for(size_t i = 0; i < _places.size(); ++i) {
