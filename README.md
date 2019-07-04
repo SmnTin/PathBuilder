@@ -8,7 +8,7 @@ The algorithm of finding optimal route through all  the given points was impleme
 - [Simple-Web-Server](https://gitlab.com/eidheim/Simple-Web-Server) for the http-interface implementation
 
 ### Prerequisites
-However, **Google Test** and **Simple-Web-Server ** will be installed automatically, Boost.Asio will not. So do it manually.
+However, **Google Test** and **Simple-Web-Server** will be installed automatically, Boost.Asio will not. So do it manually.
 For instance, on Ubuntu/Debian type the following into the terminal :
 ```bash
 sudo apt-get install libboost-all-dev
