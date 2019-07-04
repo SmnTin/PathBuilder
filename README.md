@@ -1,20 +1,20 @@
-#Path Builder project
+# Path Builder project
 The algorithm of finding optimal route through all  the given points was implemented in this project, in other words, traveling salesman problem.It was designed for the Unwayl app to build optimal routes through real places with given timetable. It uses DP with subsets to build path inside the day and a greedy solution for building the whole week. This algorithm works under the http-interface, and also it both gets requests and gives responses in the JSON-format.
 
-##Getting started
-###Dependencies
+## Getting started
+### Dependencies
 - [Google Test](https://github.com/google/googletest) for the tests
 - [Boost.Asio](https://www.boost.org/doc/libs/1_66_0/doc/html/boost_asio.html) for cross-platform sockets
 - [Simple-Web-Server](https://gitlab.com/eidheim/Simple-Web-Server) for the http-interface implementation
 
-###Prerequisites
+### Prerequisites
 However, **Google Test** and **Simple-Web-Server ** will be installed automatically, Boost.Asio will not. So do it manually.
 For instance, on Ubuntu/Debian type the following into the terminal :
 ```bash
 sudo apt-get install libboost-all-dev
 ```
 
-###Installation
+### Installation
 Firstly, clone the repo and submodules.
 ```bash
 git clone https://github.com/SmnTin/PathBuilder
@@ -32,16 +32,16 @@ And, finally, build.
 make -j4
 ```
 
-##Usage
-###Executing
+## Usage
+### Executing
 Inside the *build* directory run **PathBuilder** executable.
 ```bash
 ./PathBuilder
 ```
 Then it would be available on the http://localhost:9005
 
-###Example inputs and outputs
-```json
+### Example inputs and outputs
+```TSX
 {
   "INPUT": {
     "mode": "full", //to build optimal routes
@@ -123,14 +123,14 @@ Then it would be available on the http://localhost:9005
 }
 ```
 
-##Testing
+## Testing
 If you want to see if it passes tests, run the following inside the *build* directory:
 ```bash
 ./tests
 ```
 
-##Contributing
+## Contributing
 No contributing is available yet.
 
-##Authors
+## Authors
 Entirely written by **SmnTin**.
