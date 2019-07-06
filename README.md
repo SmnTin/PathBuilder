@@ -17,6 +17,7 @@ And you also need CMake and G++ compiler to build the project.
 On Ubuntu/Debian:
 ```Shell
 sudo apt-get install build-essential
+sudo apt-get install cmake
 ```
 
 ### Installation
@@ -24,6 +25,7 @@ Firstly, clone the repo and submodules.
 ```bash
 git clone https://github.com/SmnTin/PathBuilder
 cd PathBuilder/
+git submodule init
 git submodule update
 ```
 Then configure the build.
