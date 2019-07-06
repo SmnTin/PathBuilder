@@ -95,7 +95,7 @@ Then it would be available on the http://localhost:9005
       },
       "time_to_get": "1:00"
     }],
-    "matrices": [
+    "matrices": [ //values are in minutes
       [0,0,0,0], //time by foot-walking
       [0,0,0,0], //time by taxi
       [0,0,0,0], //time by public transport
@@ -108,7 +108,21 @@ Then it would be available on the http://localhost:9005
         "id": 0,
         "starts": "9:00",
         "lasts": "1:00",
-        "price": 150
+        "price": 150,
+        "transports": { //transports to get out of (V2: to get into) this point
+          "0": {//foot-walking
+            "possible": true, //if it's possible to use this transport without breaking the order of pts
+            "takes": 15 //minutes
+          },
+          "1": { //taxi
+            "possible": true,
+            "takes": 5
+          },
+          "2": { //public transport
+            "possible": true,
+            "takes": 10
+          }
+        }
       }],
       "price": 150
     }],
@@ -122,7 +136,21 @@ Then it would be available on the http://localhost:9005
         "id": 0,
         "starts": "9:00",
         "lasts": "1:00",
-        "price": 150
+        "price": 150,
+        "transports": { //transports to get out of (V2: to get into) this point
+          "0": {//foot-walking
+            "possible": true, //if it's possible to use this transport without breaking the order of pts
+            "takes": 15 //minutes
+          },
+          "1": { //taxi
+            "possible": true,
+            "takes": 5
+          },
+          "2": { //public transport
+            "possible": true,
+            "takes": 10
+          }
+        }
       }],
       "price": 150
     }
