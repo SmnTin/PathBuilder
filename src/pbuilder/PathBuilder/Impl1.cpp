@@ -56,6 +56,9 @@ namespace pbuilder {
         }
 
         void _prepareMatrices() {
+            if(_matrices.empty())
+                throw std::runtime_error("No matrices were given");
+            
             size_t n = _matrices[0]->cols();
             _resultedMat = std::make_shared<MatInt>(n, n, INF);
 
