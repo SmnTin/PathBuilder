@@ -26,7 +26,8 @@ namespace pbuilder {
         typedef int Id;
 
         Coordinates coords;
-        TimePoint timeToGet;
+        std::vector<TimePoint> timesToGet;
+        int chosen = 0;
         Id id;
 
         virtual bool visitable(TimePoint dayStart, TimePoint dayEnd) const = 0;
@@ -73,7 +74,8 @@ namespace pbuilder {
         PlaceWithMixedTimetable();
 
         PlaceWithMixedTimetable(const Coordinates & coords_,
-                           const TimePoint & timeToGet_,
+                           const std::vector<TimePoint> & timesToGet_,
+                           int chosen_,
                            Id id_ = 0);
 
         void addTimetableElement(ShPtr<TimetableElement> element, int dayOfWeek);

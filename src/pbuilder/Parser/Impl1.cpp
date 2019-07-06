@@ -65,9 +65,14 @@ namespace pbuilder {
                 if(json["mode"] == "route")
                     id = objJson["id"];
 
-                auto timeToGet = TimePoint::fromString(objJson["time_to_get"]);
+                std::vector<TimePoint> timesToGet;
+                int chosen = objJson["time_to_get_chosen"];
+                nlohmann::json & timeToGetJson = objJson["time_to_get_transports"];
 
-                ShPtr<PlaceWithMixedTimetable> place = std::make_shared<PlaceWithMixedTimetable>(coords, timeToGet, id);
+                for(nlohmann::json::iterator it2 = timeToGetJson.begin(); it2 != timeToGetJson.end(); ++it2)
+                    timesToGet.emplace_back(*it2);
+
+                ShPtr<PlaceWithMixedTimetable> place = std::make_shared<PlaceWithMixedTimetable>(coords, timesToGet, chosen, id);
 
                 for(size_t dayOfWeek = 0; dayOfWeek < DAYS_IN_WEEK; dayOfWeek++) {
                     if (objJson["timetable"].count(DAYS_OF_WEEK_STR[dayOfWeek])) {

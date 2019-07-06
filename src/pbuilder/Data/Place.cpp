@@ -24,11 +24,13 @@ namespace pbuilder {
     PlaceWithMixedTimetable::PlaceWithMixedTimetable() = default;
 
     PlaceWithMixedTimetable::PlaceWithMixedTimetable(const Coordinates & coords_,
-                                           const TimePoint & timeToGet_,
-                                           Id id_) {
+                                                     const std::vector<TimePoint> & timesToGet_,
+                                                     int chosen_,
+                                                     Id id_) {
         id = id_;
         coords = coords_;
-        timeToGet = timeToGet_;
+        timesToGet = timesToGet_;
+        chosen = chosen_;
 
         _timetable.assign(DAYS_IN_WEEK, std::vector<ShPtr<TimetableElement>>());
     }
@@ -54,7 +56,7 @@ namespace pbuilder {
 
     bool PlaceWithMixedTimetable::visitable(TimePoint dayStart, TimePoint dayEnd) const {
         for(int dayOfWeek = 0; dayOfWeek < DAYS_IN_WEEK; dayOfWeek++) {
-            auto interval = nearestTime(dayStart + timeToGet, dayOfWeek);
+            auto interval = nearestTime(dayStart + timesToGet[chosen], dayOfWeek);
             if(interval.starts + interval.lasts < dayEnd)
                 return true;
         }

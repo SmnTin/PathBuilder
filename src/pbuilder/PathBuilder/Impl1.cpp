@@ -95,7 +95,7 @@ namespace pbuilder {
                         continue;
                     } else if(_count(mask) == 1) {
                         // base case
-                        p_interval[mask][i] = place->nearestTime(_dayStart + place->timeToGet, dayOfWeek);
+                        p_interval[mask][i] = place->nearestTime(_dayStart + place->timesToGet[place->chosen], dayOfWeek);
                         dp[mask][i] = (p_interval[mask][i].starts +
                                        p_interval[mask][i].lasts).getTimePoint();
                     } else {
