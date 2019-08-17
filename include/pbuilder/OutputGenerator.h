@@ -15,14 +15,14 @@ namespace pbuilder {
     public:
         std::string generate() override = 0;
 
-        static ShPtr<OutputGeneratorFullMode> create(const PathBuilder::Result & output);
+        static ShPtr<OutputGeneratorFullMode> create(const PathBuilder::Result &output);
     };
 
     class OutputGeneratorRouteMode : public OutputGenerator {
     public:
         std::string generate() override = 0;
 
-        static ShPtr<OutputGeneratorRouteMode> create(const PathChecker::Result & output);
+        static ShPtr<OutputGeneratorRouteMode> create(const PathChecker::Result &output);
     };
 }
 

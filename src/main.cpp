@@ -12,13 +12,14 @@ int main() {
 
     auto runner = pbuilder::Runner::create();
 
-    server.resource["^/$"]["POST"] = [runner](std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request) {
-         try {
-             response->write(runner->run(request->content.string()));
-         }
-         catch(const std::exception &e) {
-             response->write(SimpleWeb::StatusCode::client_error_bad_request, e.what());
-         }
+    server.resource["^/$"]["POST"] = [runner](std::shared_ptr<HttpServer::Response> response,
+                                              std::shared_ptr<HttpServer::Request> request) {
+        try {
+            response->write(runner->run(request->content.string()));
+        }
+        catch (const std::exception &e) {
+            response->write(SimpleWeb::StatusCode::client_error_bad_request, e.what());
+        }
     };
 
     server.on_error = [](std::shared_ptr<HttpServer::Request> /*request*/, const SimpleWeb::error_code & /*ec*/) {

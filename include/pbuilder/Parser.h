@@ -10,8 +10,8 @@ namespace pbuilder {
     public:
         struct Result {
             enum Mode {
-                FULL=0,
-                ROUTE=1
+                FULL = 0,
+                ROUTE = 1
             } mode = Mode::FULL;
             int dayOfWeek = 0;
             Coordinates startingPos;
@@ -21,7 +21,8 @@ namespace pbuilder {
         };
 
         static ShPtr<Parser> create();
-        virtual Result parse(const std::string & request) = 0;
+
+        virtual Result parse(const std::string &request) = 0;
     };
 }
 

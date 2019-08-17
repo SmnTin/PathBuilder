@@ -14,7 +14,7 @@ namespace {
         auto el2 = std::make_shared<FreeTimetableElement>(TimePoint(14), TimePoint(100), TimePoint(15), 50);
 
         PlaceWithMixedTimetable place1(Coordinates{10, 20},
-                                  TimePoint(5));
+                                       TimePoint(5));
         place1.addTimetableElement(el1, 0);
         place1.addTimetableElement(el2, 1);
 

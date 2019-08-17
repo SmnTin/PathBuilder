@@ -33,7 +33,7 @@ namespace pbuilder {
         };
 
 
-        virtual void setPlaces(const std::vector <ShPtr<Place>> &places) {
+        virtual void setPlaces(const std::vector<ShPtr<Place>> &places) {
             _places = places;
         };
 
@@ -45,23 +45,26 @@ namespace pbuilder {
             _dayEnd = dayEnd;
         };
 
-        virtual void setMatrices(const std::vector <ShPtr<MatInt>> &matrices) {
+        virtual void setMatrices(const std::vector<ShPtr<MatInt>> &matrices) {
             _matrices = matrices;
-            numberOfTransports = (size_t)std::max(0, (int)_matrices.size() - 1);
+            if (matrices.empty())
+                throw std::runtime_error("Matrix of chosen transports isn't provided.");
+
+            numberOfTransports = (size_t) std::max(0, (int) _matrices.size() - 1);
         };
 
         virtual void setStartingPos(const Coordinates &coordinates) {
             _coordinates = coordinates;
         };
 
-        virtual void setDayOfWeek(int dayOfWeek = 0) {
+        virtual void setDayOfWeek(int dayOfWeek) {
             _dayOfWeek = dayOfWeek;
         }
 
     protected:
-        std::vector <ShPtr<Place>> _places;
+        std::vector<ShPtr<Place>> _places;
         TimePoint _dayStart, _dayEnd;
-        std::vector <ShPtr<MatInt>> _matrices;
+        std::vector<ShPtr<MatInt>> _matrices;
         size_t numberOfTransports = 0;
         Coordinates _coordinates;
         int _dayOfWeek = 0;

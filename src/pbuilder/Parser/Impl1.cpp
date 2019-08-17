@@ -11,15 +11,15 @@ namespace pbuilder {
             result.places = _parsePlaces(json);
 
             result.dayOfWeek = 0;
-            for(int dayOfWeek = 0; dayOfWeek < DAYS_IN_WEEK; ++dayOfWeek) {
+            for (int dayOfWeek = 0; dayOfWeek < DAYS_IN_WEEK; ++dayOfWeek) {
                 std::string dayOfWeekStr = json["day_of_week"];
-                if(dayOfWeekStr == DAYS_OF_WEEK_STR[dayOfWeek]) {
+                if (dayOfWeekStr == DAYS_OF_WEEK_STR[dayOfWeek]) {
                     result.dayOfWeek = dayOfWeek;
                     break;
                 }
             }
 
-            if(json["mode"] == "route")
+            if (json["mode"] == "route")
                 result.mode = Result::Mode::ROUTE;
             else
                 result.mode = Result::Mode::FULL;
@@ -33,16 +33,16 @@ namespace pbuilder {
         }
 
     private:
-        std::vector<ShPtr<MatInt>> _parseMatrices(nlohmann::json & json) {
+        std::vector<ShPtr<MatInt>> _parseMatrices(nlohmann::json &json) {
             std::vector<ShPtr<MatInt>> res;
-            auto & arr = json["matrices"];
-            for(nlohmann::json::iterator it = arr.begin(); it != arr.end(); ++it) {
+            auto &arr = json["matrices"];
+            for (nlohmann::json::iterator it = arr.begin(); it != arr.end(); ++it) {
                 std::vector<int> matvec;
-                for(auto &el : (*it).items())
+                for (auto &el : (*it).items())
                     matvec.push_back(el.value());
 
                 size_t sqrt;
-                for(sqrt = 1; sqrt*sqrt < matvec.size(); ++sqrt);
+                for (sqrt = 1; sqrt * sqrt < matvec.size(); ++sqrt);
 
                 res.push_back(std::make_shared<MatInt>(MatInt::createFromVector(sqrt, sqrt, matvec)));
             }
@@ -50,26 +50,26 @@ namespace pbuilder {
             return res;
         }
 
-        std::vector<ShPtr<Place>> _parsePlaces(nlohmann::json & json) {
+        std::vector<ShPtr<Place>> _parsePlaces(nlohmann::json &json) {
             std::vector<ShPtr<Place>> res;
-            auto & arr = json["places"];
+            auto &arr = json["places"];
             int ind = 0;
-            for(nlohmann::json::iterator it = arr.begin(); it != arr.end(); ++it) {
-                nlohmann::json & objJson = *it;
+            for (nlohmann::json::iterator it = arr.begin(); it != arr.end(); ++it) {
+                nlohmann::json &objJson = *it;
 
                 Coordinates coords;
                 coords.latitude = objJson["coords"]["lat"];
                 coords.longitude = objJson["coords"]["long"];
 
                 int id = ind;
-                if(json["mode"] == "route")
+                if (json["mode"] == "route")
                     id = objJson["id"];
 
                 auto timeToGet = TimePoint::fromString(objJson["time_to_get"]);
 
                 ShPtr<PlaceWithMixedTimetable> place = std::make_shared<PlaceWithMixedTimetable>(coords, timeToGet, id);
 
-                for(size_t dayOfWeek = 0; dayOfWeek < DAYS_IN_WEEK; dayOfWeek++) {
+                for (size_t dayOfWeek = 0; dayOfWeek < DAYS_IN_WEEK; dayOfWeek++) {
                     if (objJson["timetable"].count(DAYS_OF_WEEK_STR[dayOfWeek])) {
                         auto &dayJson = objJson["timetable"][DAYS_OF_WEEK_STR[dayOfWeek]];
 

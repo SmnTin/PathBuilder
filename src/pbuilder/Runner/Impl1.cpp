@@ -10,7 +10,7 @@ namespace pbuilder {
 
     class RunnerImpl1 : public Runner {
     public:
-        RunnerImpl1 () {
+        RunnerImpl1() {
             _parser = Parser::create();
         }
 
@@ -19,7 +19,7 @@ namespace pbuilder {
 
             ShPtr<OutputGenerator> gen;
 
-            if(parsedInput.mode == Parser::Result::Mode::FULL) {
+            if (parsedInput.mode == Parser::Result::Mode::FULL) {
                 gen = _runFullMode(parsedInput);
             } else {
                 gen = _runRouteMode(parsedInput);
@@ -31,7 +31,7 @@ namespace pbuilder {
     private:
         ShPtr<Parser> _parser;
 
-        ShPtr<OutputGenerator> _runFullMode(Parser::Result & parsedInput) {
+        ShPtr<OutputGenerator> _runFullMode(Parser::Result &parsedInput) {
             auto pathBuilder = PathBuilder::createImpl1();
             auto pathCompleter = PathChecker::create();
 
@@ -39,9 +39,9 @@ namespace pbuilder {
             _setInput(pathCompleter, parsedInput);
 
             auto output = pathBuilder->build();
-            for(auto & block : output.blocks) {
+            for (auto &block : output.blocks) {
                 std::vector<ShPtr<Place>> filteredPlaces;
-                for(auto & placeVisited : block->order) {
+                for (auto &placeVisited : block->order) {
                     filteredPlaces.push_back(parsedInput.places[placeVisited->id]);
                 }
                 pathCompleter->setPlaces(filteredPlaces);
@@ -52,7 +52,7 @@ namespace pbuilder {
             return OutputGeneratorFullMode::create(output);
         }
 
-        ShPtr<OutputGenerator> _runRouteMode(Parser::Result & parsedInput) {
+        ShPtr<OutputGenerator> _runRouteMode(Parser::Result &parsedInput) {
             auto pathChecker = PathChecker::create();
 
             _setInput(pathChecker, parsedInput);
@@ -61,7 +61,7 @@ namespace pbuilder {
             return OutputGeneratorRouteMode::create(output);
         }
 
-        void _setInput (ShPtr<PathWorker> pathWorker, Parser::Result & parsedInput) {
+        void _setInput(const ShPtr<PathWorker> &pathWorker, Parser::Result &parsedInput) {
             pathWorker->setStartingPos(parsedInput.startingPos);
             pathWorker->setDayStart(parsedInput.dayStart);
             pathWorker->setDayEnd(parsedInput.dayEnd);

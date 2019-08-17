@@ -10,7 +10,7 @@ namespace pbuilder {
         jday["places"] = nlohmann::json::array();
         jday["day_of_week"] = DAYS_OF_WEEK_STR[block->dayOfWeek];
 
-        for(auto & place : block->order) {
+        for (auto &place : block->order) {
             nlohmann::json jplace;
             jplace["id"] = place->id;
             jplace["starts"] = place->interval.starts.toString();
@@ -19,7 +19,7 @@ namespace pbuilder {
 
 //            jplace["transports"] = nlohmann::json::object();
 
-            for(size_t i = 0; i < place->transports.size(); ++i) {
+            for (size_t i = 0; i < place->transports.size(); ++i) {
                 jplace["transports"][std::to_string(i)]["possible"] = place->transports[i].possible;
                 jplace["transports"][std::to_string(i)]["takes"] = place->transports[i].takesMinutes;
             }
@@ -43,14 +43,14 @@ namespace pbuilder {
 
             json["days"] = nlohmann::json::array();
 
-            for(auto & block : _output.blocks) {
+            for (auto &block : _output.blocks) {
                 nlohmann::json jday = generateBlockJson(block);
 
                 json["days"].push_back(jday);
             }
 
             json["unvisited"] = nlohmann::json::array();
-            for(auto & unvisitedPlace : _output.unvisited) {
+            for (auto &unvisitedPlace : _output.unvisited) {
                 json["unvisited"].push_back(unvisitedPlace);
             }
 
@@ -75,7 +75,7 @@ namespace pbuilder {
             nlohmann::json json;
 
             json["possible"] = _output.possible;
-            if(_output.possible)
+            if (_output.possible)
                 json["day"] = generateBlockJson(_output.block);
 
             return json.dump(4);

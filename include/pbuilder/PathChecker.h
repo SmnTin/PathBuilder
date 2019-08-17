@@ -11,15 +11,16 @@ namespace pbuilder {
     public:
         struct Result {
             bool possible = false;
-            ShPtr<Block> block;
+            ShPtr <Block> block;
         };
 
-        static ShPtr<PathChecker> create();
+        static ShPtr <PathChecker> create();
 
         virtual Result check() = 0;
 
     protected:
         PathChecker() {};
+
         ~PathChecker() {};
     };
 }

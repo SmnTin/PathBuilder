@@ -67,8 +67,8 @@ namespace {
         ASSERT_EQ(result.matrices[3]->rows(), 2);
         ASSERT_EQ(result.matrices[3]->cols(), 2);
 
-        ASSERT_EQ(result.dayStart.getTimePoint(), TimePoint(9*60).getTimePoint());
-        ASSERT_EQ(result.dayEnd.getTimePoint(), TimePoint(23*60).getTimePoint());
+        ASSERT_EQ(result.dayStart.getTimePoint(), TimePoint(9 * 60).getTimePoint());
+        ASSERT_EQ(result.dayEnd.getTimePoint(), TimePoint(23 * 60).getTimePoint());
 
         ASSERT_EQ(result.places.size(), 1);
         ASSERT_EQ(result.dayOfWeek, 0);

@@ -9,7 +9,7 @@ namespace pbuilder {
 
     class Runner {
     public:
-        static ShPtr<Runner> create();
+        static ShPtr <Runner> create();
 
         virtual std::string run(std::string input) = 0;
     };

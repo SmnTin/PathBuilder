@@ -11,10 +11,10 @@ namespace pbuilder {
         double df = (p2.latitude - p1.latitude) * pi / 180;
         double dl = (p2.longitude - p1.longitude) * pi / 180;
 
-        double a = sin(df/2) * sin(df/2) +
-                cos(f1) * cos(f2) *
-                sin(dl/2) * sin(dl/2);
-        double c = 2 * atan2(sqrt(a), sqrt(1-a));
+        double a = sin(df / 2) * sin(df / 2) +
+                   cos(f1) * cos(f2) *
+                   sin(dl / 2) * sin(dl / 2);
+        double c = 2 * atan2(sqrt(a), sqrt(1 - a));
 
         double d = R * c;
 
@@ -23,9 +23,9 @@ namespace pbuilder {
 
     PlaceWithMixedTimetable::PlaceWithMixedTimetable() = default;
 
-    PlaceWithMixedTimetable::PlaceWithMixedTimetable(const Coordinates & coords_,
-                                           const TimePoint & timeToGet_,
-                                           Id id_) {
+    PlaceWithMixedTimetable::PlaceWithMixedTimetable(const Coordinates &coords_,
+                                                     const TimePoint &timeToGet_,
+                                                     Id id_) {
         id = id_;
         coords = coords_;
         timeToGet = timeToGet_;
@@ -34,11 +34,11 @@ namespace pbuilder {
     }
 
     //get nearest existing interval right after certain time point
-    Interval PlaceWithMixedTimetable::nearestTime(const TimePoint & timePoint, int dayOfWeek) const {
+    Interval PlaceWithMixedTimetable::nearestTime(const TimePoint &timePoint, int dayOfWeek) const {
         Interval result;
         result.starts = TimePoint(INF);
 
-        for(auto & elPtr : _timetable[dayOfWeek])
+        for (auto &elPtr : _timetable[dayOfWeek])
             result = std::min(result, elPtr->nearestTime(timePoint));
 
         return result;
@@ -53,9 +53,9 @@ namespace pbuilder {
     }
 
     bool PlaceWithMixedTimetable::visitable(TimePoint dayStart, TimePoint dayEnd) const {
-        for(int dayOfWeek = 0; dayOfWeek < DAYS_IN_WEEK; dayOfWeek++) {
+        for (int dayOfWeek = 0; dayOfWeek < DAYS_IN_WEEK; dayOfWeek++) {
             auto interval = nearestTime(dayStart + timeToGet, dayOfWeek);
-            if(interval.starts + interval.lasts < dayEnd)
+            if (interval.starts + interval.lasts < dayEnd)
                 return true;
         }
         return false;
@@ -68,7 +68,7 @@ namespace pbuilder {
     }
 
     Interval FixedTimetableElement::nearestTime(const TimePoint &timePoint) const {
-        if(timePoint > starts) {
+        if (timePoint > starts) {
             Interval badInterval;
             badInterval.starts = TimePoint(INF);
             return badInterval;
@@ -90,7 +90,7 @@ namespace pbuilder {
     }
 
     Interval FreeTimetableElement::nearestTime(const TimePoint &timePoint) const {
-        if(timePoint > ends - lasts) {
+        if (timePoint > ends - lasts) {
             Interval badInterval;
             badInterval.starts = TimePoint(INF);
             return badInterval;

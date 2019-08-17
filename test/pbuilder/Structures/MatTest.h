@@ -41,15 +41,15 @@ namespace {
     TEST(MatTest, SavingAngRestoringValue) {
         MatInt mat(5, 4);
         int a = 100;
-        mat.at(1,1) = a;
-        EXPECT_EQ(mat.at(1,1), a);
+        mat.at(1, 1) = a;
+        EXPECT_EQ(mat.at(1, 1), a);
     }
 
     TEST(MatTest, FillingWithDefaultValue) {
         int a = 5;
         MatInt mat(5, 4, a);
-        for(int i = 0; i < 5; ++i)
-            for(int j = 0; j < 4; ++j)
+        for (int i = 0; i < 5; ++i)
+            for (int j = 0; j < 4; ++j)
                 EXPECT_EQ(mat.at(i, j), a);
     }
 
@@ -58,8 +58,8 @@ namespace {
         MatInt mat(5, 4);
         mat.fill(a);
 
-        for(int i = 0; i < 5; ++i)
-            for(int j = 0; j < 4; ++j)
+        for (int i = 0; i < 5; ++i)
+            for (int j = 0; j < 4; ++j)
                 EXPECT_EQ(mat.at(i, j), a);
     }
 

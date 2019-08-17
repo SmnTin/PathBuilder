@@ -19,10 +19,12 @@ namespace pbuilder {
 //        static ShPtr<PathBuilder> createImpl2();
 
         virtual void setMaxBlockSize(size_t maxBlockSize) = 0;
+
         virtual Result build() = 0;
 
     protected:
         PathBuilder() = default;
+
         ~PathBuilder() = default;
     };
 } //pbuilder
