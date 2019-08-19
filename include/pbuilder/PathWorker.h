@@ -37,6 +37,10 @@ namespace pbuilder {
             _places = places;
         };
 
+        virtual void setFirstDayStart(const TimePoint &dayStart) {
+            _firstDayStart = dayStart;
+        }
+
         virtual void setDayStart(const TimePoint &dayStart) {
             _dayStart = dayStart;
         }
@@ -63,7 +67,7 @@ namespace pbuilder {
 
     protected:
         std::vector<ShPtr<Place>> _places;
-        TimePoint _dayStart, _dayEnd;
+        TimePoint _firstDayStart, _dayStart, _dayEnd;
         std::vector<ShPtr<MatInt>> _matrices;
         size_t numberOfTransports = 0;
         Coordinates _coordinates;

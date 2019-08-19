@@ -58,6 +58,7 @@ Then it would be available on the http://localhost:9005
       "lat": 111,
       "long": 222
     },
+    "first_day_start": "10:00",
     "day_start": "9:00",
     "day_end": "23:00",
     "day_of_week": "monday",

@@ -15,7 +15,7 @@ namespace pbuilder {
             } mode = Mode::FULL;
             int dayOfWeek = 0;
             Coordinates startingPos;
-            TimePoint dayStart, dayEnd;
+            TimePoint firstDayStart, dayStart, dayEnd;
             std::vector<ShPtr<MatInt>> matrices;
             std::vector<ShPtr<Place>> places;
         };

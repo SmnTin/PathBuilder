@@ -7,17 +7,17 @@ namespace pbuilder {
             auto json = nlohmann::json::parse(data);
 
             Result result;
-            result.matrices = _parseMatrices(json);
-            result.places = _parsePlaces(json);
+            result.places = _parsePlaces(json["places"], json["mode"]);
+            result.matrices = _parseMatrices(json["matrices"]);
 
-            result.dayOfWeek = 0;
-            for (int dayOfWeek = 0; dayOfWeek < DAYS_IN_WEEK; ++dayOfWeek) {
-                std::string dayOfWeekStr = json["day_of_week"];
-                if (dayOfWeekStr == DAYS_OF_WEEK_STR[dayOfWeek]) {
-                    result.dayOfWeek = dayOfWeek;
-                    break;
-                }
-            }
+            if (result.matrices.empty())
+                throw std::runtime_error("No matrices were given");
+
+            for (auto &mat : result.matrices)
+                if (mat->rows() != mat->cols() || mat->rows() != result.places.size())
+                    throw std::runtime_error("Incorrect matrices were given");
+
+            result.dayOfWeek = _parseDayOfWeek(json["day_of_week"]);
 
             if (json["mode"] == "route")
                 result.mode = Result::Mode::ROUTE;
@@ -26,6 +26,7 @@ namespace pbuilder {
 
             result.startingPos.latitude = json["starting_pos"]["lat"];
             result.startingPos.longitude = json["starting_pos"]["long"];
+            result.firstDayStart = TimePoint::fromString(json["first_day_start"], "00:00", 1);
             result.dayStart = TimePoint::fromString(json["day_start"], "00:00", 1);
             result.dayEnd = TimePoint::fromString(json["day_end"], "00:00", 1);
 
@@ -33,9 +34,18 @@ namespace pbuilder {
         }
 
     private:
-        std::vector<ShPtr<MatInt>> _parseMatrices(nlohmann::json &json) {
+        int _parseDayOfWeek(const std::string &str) {
+            for (int dayOfWeek = 0; dayOfWeek < DAYS_IN_WEEK; ++dayOfWeek) {
+                if (str == DAYS_OF_WEEK_STR[dayOfWeek]) {
+                    return dayOfWeek;
+                }
+            }
+
+            throw std::runtime_error("Incorrect day of week occurred during parsing");
+        }
+
+        std::vector<ShPtr<MatInt>> _parseMatrices(nlohmann::json &arr) {
             std::vector<ShPtr<MatInt>> res;
-            auto &arr = json["matrices"];
             for (nlohmann::json::iterator it = arr.begin(); it != arr.end(); ++it) {
                 std::vector<int> matvec;
                 for (auto &el : (*it).items())
@@ -50,9 +60,8 @@ namespace pbuilder {
             return res;
         }
 
-        std::vector<ShPtr<Place>> _parsePlaces(nlohmann::json &json) {
+        std::vector<ShPtr<Place>> _parsePlaces(nlohmann::json &arr, const std::string &mode) {
             std::vector<ShPtr<Place>> res;
-            auto &arr = json["places"];
             int ind = 0;
             for (nlohmann::json::iterator it = arr.begin(); it != arr.end(); ++it) {
                 nlohmann::json &objJson = *it;
@@ -62,7 +71,7 @@ namespace pbuilder {
                 coords.longitude = objJson["coords"]["long"];
 
                 int id = ind;
-                if (json["mode"] == "route")
+                if (mode == "route")
                     id = objJson["id"];
 
                 auto timeToGet = TimePoint::fromString(objJson["time_to_get"]);
@@ -73,8 +82,7 @@ namespace pbuilder {
                     if (objJson["timetable"].count(DAYS_OF_WEEK_STR[dayOfWeek])) {
                         auto &dayJson = objJson["timetable"][DAYS_OF_WEEK_STR[dayOfWeek]];
 
-                        for (nlohmann::json::iterator it2 = dayJson.begin(); it2 != dayJson.end(); ++it2) {
-                            auto &timetableEl = *it2;
+                        for (auto &timetableEl : dayJson) {
                             if (timetableEl["type"] == "time_point") {
                                 auto starts = TimePoint::fromString(timetableEl["starts"]);
                                 auto lasts = TimePoint::fromString(timetableEl["lasts"]);

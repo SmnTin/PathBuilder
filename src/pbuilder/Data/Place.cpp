@@ -34,7 +34,7 @@ namespace pbuilder {
     }
 
     //get nearest existing interval right after certain time point
-    Interval PlaceWithMixedTimetable::nearestTime(const TimePoint &timePoint, int dayOfWeek) const {
+    Interval PlaceWithMixedTimetable::nearestTime(const TimePoint &timePoint, size_t dayOfWeek) const {
         Interval result;
         result.starts = TimePoint(INF);
 
@@ -44,7 +44,7 @@ namespace pbuilder {
         return result;
     }
 
-    void PlaceWithMixedTimetable::addTimetableElement(ShPtr<pbuilder::TimetableElement> element, int dayOfWeek) {
+    void PlaceWithMixedTimetable::addTimetableElement(ShPtr<pbuilder::TimetableElement> element, size_t dayOfWeek) {
         _timetable[dayOfWeek].push_back(element);
     }
 
@@ -53,7 +53,7 @@ namespace pbuilder {
     }
 
     bool PlaceWithMixedTimetable::visitable(TimePoint dayStart, TimePoint dayEnd) const {
-        for (int dayOfWeek = 0; dayOfWeek < DAYS_IN_WEEK; dayOfWeek++) {
+        for (size_t dayOfWeek = 0; dayOfWeek < DAYS_IN_WEEK; dayOfWeek++) {
             auto interval = nearestTime(dayStart + timeToGet, dayOfWeek);
             if (interval.starts + interval.lasts < dayEnd)
                 return true;
@@ -103,7 +103,7 @@ namespace pbuilder {
         }
     }
 
-    bool PlaceWithMixedTimetable::daysOfWeekComparator(int dayA, int dayB) const {
+    bool PlaceWithMixedTimetable::daysOfWeekComparator(size_t dayA, size_t dayB) const {
         return _timetable[dayA].size() < _timetable[dayB].size();
     }
 

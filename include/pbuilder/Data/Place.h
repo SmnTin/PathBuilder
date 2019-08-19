@@ -32,9 +32,9 @@ namespace pbuilder {
         virtual bool visitable(TimePoint dayStart, TimePoint dayEnd) const = 0;
 
         //get nearest existing interval right after certain time point
-        virtual Interval nearestTime(const TimePoint &timePoint, int dayOfWeek) const = 0;
+        virtual Interval nearestTime(const TimePoint &timePoint, size_t dayOfWeek) const = 0;
 
-        virtual bool daysOfWeekComparator(int dayA, int dayB) const = 0;
+        virtual bool daysOfWeekComparator(size_t dayA, size_t dayB) const = 0;
 
         virtual bool operator<(const Place &b) const = 0;
 
@@ -78,13 +78,13 @@ namespace pbuilder {
                                 const TimePoint &timeToGet_,
                                 Id id_ = 0);
 
-        void addTimetableElement(ShPtr<TimetableElement> element, int dayOfWeek);
+        void addTimetableElement(ShPtr<TimetableElement> element, size_t dayOfWeek);
 
         bool visitable(TimePoint dayStart, TimePoint dayEnd) const override;
 
-        Interval nearestTime(const TimePoint &timePoint, int dayOfWeek) const override;
+        Interval nearestTime(const TimePoint &timePoint, size_t dayOfWeek) const override;
 
-        bool daysOfWeekComparator(int dayA, int dayB) const override;
+        bool daysOfWeekComparator(size_t dayA, size_t dayB) const override;
 
         bool operator<(const Place &b) const override;
 
