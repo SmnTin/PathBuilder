@@ -14,7 +14,7 @@ namespace pbuilder {
 
         struct Transport {
             bool possible = false;
-            int takesMinutes = 0;
+            uint takesMinutes = 0;
         };
 
         struct PlaceVisited {
@@ -22,13 +22,13 @@ namespace pbuilder {
             Id id = 0;
             Interval interval;
             std::vector<Transport> transports;
-            size_t chosenTransport = 0;
+            uint chosenTransport = 0;
         };
 
         struct Block {
             int price = 0;
             int mask = 0;
-            int dayOfWeek = 0;
+            uint dayOfWeek = 0;
             std::vector<ShPtr<PlaceVisited>> order;
         };
 
@@ -61,7 +61,7 @@ namespace pbuilder {
             _coordinates = coordinates;
         };
 
-        virtual void setDayOfWeek(int dayOfWeek) {
+        virtual void setDayOfWeek(uint dayOfWeek) {
             _dayOfWeek = dayOfWeek;
         }
 
@@ -71,7 +71,7 @@ namespace pbuilder {
         std::vector<ShPtr<MatInt>> _matrices;
         size_t numberOfTransports = 0;
         Coordinates _coordinates;
-        int _dayOfWeek = 0;
+        uint _dayOfWeek = 0;
     };
 } //pbuilder
 

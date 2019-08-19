@@ -34,8 +34,8 @@ namespace pbuilder {
         }
 
     private:
-        int _parseDayOfWeek(const std::string &str) {
-            for (int dayOfWeek = 0; dayOfWeek < DAYS_IN_WEEK; ++dayOfWeek) {
+        uint _parseDayOfWeek(const std::string &str) {
+            for (uint dayOfWeek = 0; dayOfWeek < DAYS_IN_WEEK; ++dayOfWeek) {
                 if (str == DAYS_OF_WEEK_STR[dayOfWeek]) {
                     return dayOfWeek;
                 }
@@ -46,9 +46,9 @@ namespace pbuilder {
 
         std::vector<ShPtr<MatInt>> _parseMatrices(nlohmann::json &arr) {
             std::vector<ShPtr<MatInt>> res;
-            for (nlohmann::json::iterator it = arr.begin(); it != arr.end(); ++it) {
+            for (auto &objJson : arr) {
                 std::vector<int> matvec;
-                for (auto &el : (*it).items())
+                for (auto &el : objJson.items())
                     matvec.push_back(el.value());
 
                 size_t sqrt;
@@ -63,9 +63,7 @@ namespace pbuilder {
         std::vector<ShPtr<Place>> _parsePlaces(nlohmann::json &arr, const std::string &mode) {
             std::vector<ShPtr<Place>> res;
             int ind = 0;
-            for (nlohmann::json::iterator it = arr.begin(); it != arr.end(); ++it) {
-                nlohmann::json &objJson = *it;
-
+            for (auto &objJson : arr) {
                 Coordinates coords;
                 coords.latitude = objJson["coords"]["lat"];
                 coords.longitude = objJson["coords"]["long"];

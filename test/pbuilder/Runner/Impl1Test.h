@@ -18,6 +18,7 @@ namespace {
       "lat": 111,
       "long": 222
     },
+    "first_day_start": "8:00",
     "day_start": "8:00",
     "day_end": "23:00",
     "day_of_week": "monday",
@@ -72,7 +73,7 @@ namespace {
 
         auto result = runner->run(input);
 
-        std::cout << result << std::endl;
+//        std::cout << result << std::endl;
     }
 
     TEST(Runner, GeneralTest2) {
@@ -83,6 +84,7 @@ namespace {
     "lat": 50.084243,
     "long": 8.719368
   },
+  "first_day_start": "8:00",
   "day_start": "8:00",
   "day_end": "23:00",
   "places": [

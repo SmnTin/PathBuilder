@@ -72,7 +72,7 @@ namespace pbuilder {
         }
 
         //the "core" function. It calculates an optimal route through all given vertices;
-        ShPtr<Block> _hamilton(const std::vector<Place::Id> &pts, int dayOfWeek, int savedMask = 0) {
+        ShPtr<Block> _hamilton(const std::vector<Place::Id> &pts, uint day, uint dayOfWeek, int savedMask = 0) {
 
             size_t n = pts.size();
             int M = (1 << n);
@@ -85,7 +85,8 @@ namespace pbuilder {
             std::vector<std::vector<Interval>> p_interval(M, std::vector<Interval>(n));
 
             //values needed to restore the vertices order
-            std::vector<int> min_val(n + 1, INF), min_mask(n + 1, 0), min_i(n + 1, 0);
+            std::vector<int> min_val(n + 1, INF), min_mask(n + 1, 0);
+            std::vector<size_t> min_i(n + 1, 0);
             int max_val = 0;
 
             //calculating DP
@@ -100,7 +101,8 @@ namespace pbuilder {
                         continue;
                     } else if (_count(mask) == 1) {
                         // base case
-                        p_interval[mask][i] = place->nearestTime(_dayStart + place->timeToGet, dayOfWeek);
+                        TimePoint dayStart = (day == 0 ? _firstDayStart : _dayStart);
+                        p_interval[mask][i] = place->nearestTime(dayStart + place->timeToGet, dayOfWeek);
                         dp[mask][i] = (p_interval[mask][i].starts +
                                        p_interval[mask][i].lasts).getTimePoint();
                     } else {
@@ -182,7 +184,7 @@ namespace pbuilder {
         Result _calcResultImpl1() {
             Result result;
 
-            int dayOfWeek = _dayOfWeek;
+            uint dayOfWeek = _dayOfWeek, day = 0;
             std::queue<int>
                     toVisit = _orderedPlaces(dayOfWeek),
                     visited;
@@ -200,7 +202,7 @@ namespace pbuilder {
                         ) {
                     //push to "visited" queue unused places to use them on the next iterations
                     for (size_t i = 0; i < places.size(); ++i) {
-                        if (!_bit(mask, i)) {
+                        if (!_bit(mask, i) && _bit(updatedMask, i)) {
                             visited.push(places[i]);
                             updatedMask = (updatedMask ^ (1 << i));
                         }
@@ -218,13 +220,13 @@ namespace pbuilder {
                     //take places from not visited queue to fit the block size
                     while (places.size() < _maxBlockSize && !toVisit.empty()) {
                         places.push_back(toVisit.front());
-                        int i = places.size() - 1;
+                        size_t i = places.size() - 1;
                         toVisit.pop();
                         updatedMask = (updatedMask ^ (1 << i));
                     }
 
                     //apply DP algorithm to find optimal route
-                    auto curBlock = _hamilton(places, dayOfWeek, mask);
+                    auto curBlock = _hamilton(places, day, dayOfWeek, mask);
                     mask = curBlock->mask;
                     block = curBlock;
                 }
@@ -249,13 +251,14 @@ namespace pbuilder {
                 //move to the next day of a week
                 dayOfWeek++;
                 dayOfWeek %= DAYS_IN_WEEK;
+                day++;
             }
 
             result.unvisited = _unvisited;
             return result;
         }
 
-        std::queue<int> _orderedPlaces(std::vector<int> pts, int dayOfWeek) {
+        std::queue<int> _orderedPlaces(std::vector<int> pts, size_t dayOfWeek) {
             std::vector<std::tuple<int, double, int>> order;
             std::queue<int> result;
 
@@ -272,7 +275,7 @@ namespace pbuilder {
             return result;
         }
 
-        std::queue<int> _orderedPlaces(std::queue<int> ptsq, int dayOfWeek) {
+        std::queue<int> _orderedPlaces(std::queue<int> ptsq, size_t dayOfWeek) {
             std::vector<int> pts;
             while (!ptsq.empty()) {
                 pts.push_back(ptsq.front());
@@ -282,7 +285,7 @@ namespace pbuilder {
             return _orderedPlaces(pts, dayOfWeek);
         }
 
-        std::queue<int> _orderedPlaces(int dayOfWeek) {
+        std::queue<int> _orderedPlaces(size_t dayOfWeek) {
             std::vector<int> pts;
             for (size_t i = 0; i < _places.size(); ++i)
                 pts.push_back(i);
