@@ -14,7 +14,7 @@ namespace pbuilder {
 
         struct Transport {
             bool possible = false;
-            uint takesMinutes = 0;
+            uint takesMinutes = 0, timeLeftMinutes = 0, cost = 0;
         };
 
         struct PlaceVisited {
@@ -28,7 +28,7 @@ namespace pbuilder {
         struct Block {
             int price = 0;
             int mask = 0;
-            uint dayOfWeek = 0;
+            uint dayOfWeek = 0, day = 0;
             std::vector<ShPtr<PlaceVisited>> order;
         };
 

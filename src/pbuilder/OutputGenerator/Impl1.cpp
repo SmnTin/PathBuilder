@@ -9,6 +9,7 @@ namespace pbuilder {
         jday["price"] = block->price;
         jday["places"] = nlohmann::json::array();
         jday["day_of_week"] = DAYS_OF_WEEK_STR[block->dayOfWeek];
+        jday["day"] = block->day;
 
         for (auto &place : block->order) {
             nlohmann::json jplace;
@@ -22,6 +23,8 @@ namespace pbuilder {
             for (size_t i = 0; i < place->transports.size(); ++i) {
                 jplace["transports"][std::to_string(i)]["possible"] = place->transports[i].possible;
                 jplace["transports"][std::to_string(i)]["takes"] = place->transports[i].takesMinutes;
+                jplace["transports"][std::to_string(i)]["time_left"] = place->transports[i].timeLeftMinutes;
+                jplace["transports"][std::to_string(i)]["cost"] = place->transports[i].cost;
             }
 
             jday["places"].push_back(jplace);

@@ -18,7 +18,10 @@ namespace pbuilder {
                     place->transports.assign(numberOfTransports, Transport());
                     place->chosenTransport = _matrices[numberOfTransports]->at(place->id, nextPlace->id);
                     for (size_t j = 0; j < numberOfTransports; ++j) {
-                        place->transports[j].takesMinutes = _matrices[j]->at(place->id, nextPlace->id);
+                        place->transports[j].takesMinutes = (uint)_matrices[j]->at(place->id, nextPlace->id);
+                        place->transports[j].timeLeftMinutes = (nextPlace->interval.starts - place->interval.starts -
+                                                                place->interval.lasts).getTimePoint() -
+                                                               place->transports[j].takesMinutes;
                         _resultedMat->at(place->id, nextPlace->id) = _matrices[j]->at(place->id, nextPlace->id);
 
                         auto curResult = _check();
@@ -33,8 +36,13 @@ namespace pbuilder {
             return result;
         }
 
+        void setDay(uint day) override {
+            _day = day;
+        }
+
     protected:
 
+        uint _day = 0;
         ShPtr<MatInt> _resultedMat;
 
         virtual void _prepareInput() {
@@ -50,10 +58,11 @@ namespace pbuilder {
         }
 
         virtual Result _check() {
-            TimePoint currentTime = _dayStart;
+            TimePoint currentTime = (_day == 0 ? _firstDayStart : _dayStart);
             Result result;
             result.block = std::make_shared<Block>();
             result.block->dayOfWeek = _dayOfWeek;
+            result.block->day = _day;
             result.possible = true;
 
             for (size_t i = 0; i < _places.size(); ++i) {

@@ -35,8 +35,8 @@ namespace pbuilder {
             auto pathBuilder = PathBuilder::createImpl1();
             auto pathCompleter = PathChecker::create();
 
-            _setInput(pathBuilder, parsedInput);
-            _setInput(pathCompleter, parsedInput);
+            _setCommonInput(pathBuilder, parsedInput);
+            _setCommonInput(pathCompleter, parsedInput);
 
             auto output = pathBuilder->build();
             for (auto &block : output.blocks) {
@@ -46,6 +46,7 @@ namespace pbuilder {
                 }
                 pathCompleter->setPlaces(filteredPlaces);
                 pathCompleter->setDayOfWeek(block->dayOfWeek);
+                pathCompleter->setDay(block->day);
 
                 block = pathCompleter->check().block;
             }
@@ -55,13 +56,14 @@ namespace pbuilder {
         ShPtr<OutputGenerator> _runRouteMode(Parser::Result &parsedInput) {
             auto pathChecker = PathChecker::create();
 
-            _setInput(pathChecker, parsedInput);
+            _setCommonInput(pathChecker, parsedInput);
+            pathChecker->setDay(parsedInput.day);
 
             auto output = pathChecker->check();
             return OutputGeneratorRouteMode::create(output);
         }
 
-        void _setInput(const ShPtr<PathWorker> &pathWorker, Parser::Result &parsedInput) {
+        void _setCommonInput(const ShPtr<PathWorker> &pathWorker, Parser::Result &parsedInput) {
             pathWorker->setStartingPos(parsedInput.startingPos);
             pathWorker->setDayStart(parsedInput.dayStart);
             pathWorker->setDayEnd(parsedInput.dayEnd);

@@ -62,6 +62,7 @@ Then it would be available on the http://localhost:9005
     "day_start": "9:00",
     "day_end": "23:00",
     "day_of_week": "monday",
+    "day": 2, //"in case of "route" mode, 0-indexation
     "places": [{
       "id": 0, //in case of "route" mode
       "coords": {
@@ -113,18 +114,23 @@ Then it would be available on the http://localhost:9005
         "transports": { //transports to get out of (V2: to get into) this point
           "0": {//foot-walking
             "possible": true, //if it's possible to use this transport without breaking the order of pts
-            "takes": 15 //minutes
+            "takes": 15, //minutes
+            "time_left": 0 //minutes
           },
           "1": { //taxi
             "possible": true,
-            "takes": 5
+            "takes": 5,
+            "time_left": 0
           },
           "2": { //public transport
             "possible": true,
-            "takes": 10
+            "takes": 10,
+            "time_left": 0
           }
         }
       }],
+      "day": 0,
+      "day_of_week": "monday",
       "price": 150
     }],
     "full_price": 150
@@ -141,18 +147,23 @@ Then it would be available on the http://localhost:9005
         "transports": { //transports to get out of (V2: to get into) this point
           "0": {//foot-walking
             "possible": true, //if it's possible to use this transport without breaking the order of pts
-            "takes": 15 //minutes
+            "takes": 15, //minutes
+            "time_left": 0 //minutes
           },
           "1": { //taxi
             "possible": true,
-            "takes": 5
+            "takes": 5,
+            "time_left": 0
           },
           "2": { //public transport
             "possible": true,
-            "takes": 10
+            "takes": 10,
+            "time_left": 0
           }
         }
       }],
+      "day": 0,
+      "day_of_week": "monday",
       "price": 150
     }
   },

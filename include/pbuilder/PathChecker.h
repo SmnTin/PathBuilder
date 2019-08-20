@@ -16,6 +16,8 @@ namespace pbuilder {
 
         static ShPtr <PathChecker> create();
 
+        virtual void setDay(uint day) = 0;
+
         virtual Result check() = 0;
 
     protected:

@@ -18,6 +18,8 @@ namespace pbuilder {
                     throw std::runtime_error("Incorrect matrices were given");
 
             result.dayOfWeek = _parseDayOfWeek(json["day_of_week"]);
+            if (json["mode"] == "route")
+                result.day = json["day"];
 
             if (json["mode"] == "route")
                 result.mode = Result::Mode::ROUTE;

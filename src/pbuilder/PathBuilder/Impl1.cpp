@@ -145,6 +145,7 @@ namespace pbuilder {
             //retrieving result
             auto block = std::make_shared<Block>();
             block->dayOfWeek = dayOfWeek;
+            block->day = day;
 
             if (max_val > 0) {
                 int cur_mask = min_mask[max_val];
@@ -194,49 +195,35 @@ namespace pbuilder {
 
                 std::vector<int> places;
                 int mask = 0;
-                int updatedMask = 0;
                 auto block = std::make_shared<Block>();
 
                 while (!toVisit.empty()
                        && _count(mask) < _maxBlockSize
                         ) {
-                    //push to "visited" queue unused places to use them on the next iterations
-                    for (size_t i = 0; i < places.size(); ++i) {
-                        if (!_bit(mask, i) && _bit(updatedMask, i)) {
-                            visited.push(places[i]);
-                            updatedMask = (updatedMask ^ (1 << i));
-                        }
-                    }
-
-                    //replace unused places
-                    for (size_t i = 0; i < places.size() && !toVisit.empty(); ++i) {
-                        if (!_bit(mask, i)) {
-                            places[i] = toVisit.front();
-                            toVisit.pop();
-                            updatedMask = (updatedMask ^ (1 << i));
-                        }
-                    }
-
                     //take places from not visited queue to fit the block size
                     while (places.size() < _maxBlockSize && !toVisit.empty()) {
                         places.push_back(toVisit.front());
-                        size_t i = places.size() - 1;
                         toVisit.pop();
-                        updatedMask = (updatedMask ^ (1 << i));
                     }
 
                     //apply DP algorithm to find optimal route
                     auto curBlock = _hamilton(places, day, dayOfWeek, mask);
                     mask = curBlock->mask;
                     block = curBlock;
-                }
 
-                //push to "visited" queue unused places to use them on the next iterations
-                for (size_t i = 0; i < places.size(); ++i) {
-                    if (!_bit(mask, i)) {
-                        visited.push(places[i]);
-                        updatedMask = (updatedMask ^ (1 << i));
+                    std::vector<int> newPlaces;
+
+                    //push to "visited" queue unused places to use them on the next iterations
+                    for (size_t i = 0; i < places.size(); ++i) {
+                        if (_bit(mask, i)) {
+                            newPlaces.push_back(places[i]);
+                        } else {
+                            visited.push(places[i]);
+                        }
                     }
+
+                    mask = (1 << newPlaces.size()) - 1;
+                    places = newPlaces;
                 }
 
                 result.blocks.push_back(block);
