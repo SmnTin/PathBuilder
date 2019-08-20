@@ -66,6 +66,7 @@ namespace pbuilder {
         void _setCommonInput(const ShPtr<PathWorker> &pathWorker, Parser::Result &parsedInput) {
             pathWorker->setStartingPos(parsedInput.startingPos);
             pathWorker->setDayStart(parsedInput.dayStart);
+            pathWorker->setFirstDayStart(parsedInput.firstDayStart);
             pathWorker->setDayEnd(parsedInput.dayEnd);
             pathWorker->setMatrices(parsedInput.matrices);
             pathWorker->setPlaces(parsedInput.places);
