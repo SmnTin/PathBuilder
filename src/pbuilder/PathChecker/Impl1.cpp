@@ -18,16 +18,22 @@ namespace pbuilder {
                     place->transports.assign(numberOfTransports, Transport());
                     place->chosenTransport = _matrices[numberOfTransports]->at(place->id, nextPlace->id);
                     for (size_t j = 0; j < numberOfTransports; ++j) {
-                        place->transports[j].takesMinutes = (uint)_matrices[j]->at(place->id, nextPlace->id);
-                        place->transports[j].timeLeftMinutes = (nextPlace->interval.starts - place->interval.starts -
-                                                                place->interval.lasts).getTimePoint() -
-                                                               place->transports[j].takesMinutes;
+                        place->transports[j].takesMinutes = (uint) _matrices[j]->at(place->id, nextPlace->id);
                         _resultedMat->at(place->id, nextPlace->id) = _matrices[j]->at(place->id, nextPlace->id);
 
                         auto curResult = _check();
 
-                        if (curResult.possible)
+                        if (curResult.possible) {
                             place->transports[j].possible = true;
+
+                            auto &cPlace = curResult.block->order[i];
+                            auto &cNextPlace = curResult.block->order[i + 1];
+
+                            place->transports[j].timeLeftMinutes =
+                                    (cNextPlace->interval.starts - cPlace->interval.starts -
+                                     cPlace->interval.lasts).getTimePoint() -
+                                    place->transports[j].takesMinutes;
+                        }
                     }
 
                 }
