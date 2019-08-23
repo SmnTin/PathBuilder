@@ -21,15 +21,22 @@ namespace pbuilder {
         return d;
     }
 
-    PlaceWithMixedTimetable::PlaceWithMixedTimetable() = default;
+    Place::Place() = default;
 
-    PlaceWithMixedTimetable::PlaceWithMixedTimetable(const Coordinates &coords_,
-                                                     const TimePoint &timeToGet_,
-                                                     Id id_) {
+    Place::Place(const Coordinates &coords_, const TimePoint &timeToGet_,
+                 Place::Id id_) {
         id = id_;
         coords = coords_;
         timeToGet = timeToGet_;
+    }
 
+    PlaceWithMixedTimetable::PlaceWithMixedTimetable() {
+        _timetable.assign(DAYS_IN_WEEK, std::vector<ShPtr<TimetableElement>>());
+    }
+
+    PlaceWithMixedTimetable::PlaceWithMixedTimetable(const Coordinates &coords_,
+                                                     const TimePoint &timeToGet_,
+                                                     Id id_) : Place(coords_, timeToGet_, id_) {
         _timetable.assign(DAYS_IN_WEEK, std::vector<ShPtr<TimetableElement>>());
     }
 
@@ -44,7 +51,7 @@ namespace pbuilder {
         return result;
     }
 
-    void PlaceWithMixedTimetable::addTimetableElement(ShPtr<pbuilder::TimetableElement> element, size_t dayOfWeek) {
+    void PlaceWithMixedTimetable::addTimetableElement(ShPtr<TimetableElement> element, size_t dayOfWeek) {
         _timetable[dayOfWeek].push_back(element);
     }
 
@@ -105,6 +112,54 @@ namespace pbuilder {
 
     bool PlaceWithMixedTimetable::daysOfWeekComparator(size_t dayA, size_t dayB) const {
         return _timetable[dayA].size() < _timetable[dayB].size();
+    }
+
+    bool CustomPlace::critical(uint day) const {
+        if (hasCondition(Condition::EVERY_DAY))
+            return true;
+
+        for (uint _day : _days)
+            if (_day == day)
+                return true;
+
+        return false;
+    }
+
+    void CustomPlace::addCondition(CustomPlace::Condition condition) {
+        _conditions[condition] = true;
+    }
+
+    bool CustomPlace::hasCondition(CustomPlace::Condition condition) const {
+        return _conditions[condition];
+    }
+
+    void CustomPlace::addDay(uint day) {
+        _days.push_back(day);
+    }
+
+    bool CustomPlace::hasOverDay(uint day) {
+        for (uint _day : _days)
+            if (_day >= day)
+                return true;
+
+        return false;
+    }
+
+    CustomPlace::CustomPlace() = default;
+
+    CustomPlace::CustomPlace(const Coordinates &coords_, const TimePoint &timeToGet_,
+                             Place::Id id_) : PlaceWithMixedTimetable(coords_, timeToGet_, id_) {}
+
+    bool CustomPlace::custom() const {
+        return true;
+    }
+
+    bool PlaceWithMixedTimetable::custom() const {
+        return false;
+    }
+
+    bool PlaceWithMixedTimetable::critical(uint day) const {
+        return false;
     }
 
 } //pbuilder

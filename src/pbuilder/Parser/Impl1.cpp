@@ -14,7 +14,7 @@ namespace pbuilder {
                 throw std::runtime_error("No matrices were given");
 
             for (auto &mat : result.matrices)
-                if (mat->rows() != mat->cols() || mat->rows() != result.places.size())
+                if (mat->rows() < result.places.size())
                     throw std::runtime_error("Incorrect matrices were given");
 
             result.dayOfWeek = _parseDayOfWeek(json["day_of_week"]);
@@ -54,8 +54,10 @@ namespace pbuilder {
                     matvec.push_back(el.value());
 
                 size_t sqrt;
-                for (sqrt = 1; sqrt * sqrt < matvec.size(); ++sqrt);
+                for (sqrt = 0; sqrt * sqrt < matvec.size(); ++sqrt);
 
+                if (matvec.size() != sqrt * sqrt)
+                    throw std::runtime_error("Matrices are not square.");
                 res.push_back(std::make_shared<MatInt>(MatInt::createFromVector(sqrt, sqrt, matvec)));
             }
 
@@ -76,7 +78,32 @@ namespace pbuilder {
 
                 auto timeToGet = TimePoint::fromString(objJson["time_to_get"]);
 
-                ShPtr<PlaceWithMixedTimetable> place = std::make_shared<PlaceWithMixedTimetable>(coords, timeToGet, id);
+                ShPtr<PlaceWithMixedTimetable> place;
+                if (objJson.count("custom")) {
+                    auto curPlace = std::make_shared<CustomPlace>(coords, timeToGet, id);
+
+                    if (objJson["custom"].count("conditions")) {
+                        for (std::string cond : objJson["custom"]["conditions"]) {
+                            if (cond == "day_start")
+                                curPlace->addCondition(CustomPlace::Condition::DAY_START);
+                            else if (cond == "day_end")
+                                curPlace->addCondition(CustomPlace::Condition::DAY_END);
+                            else if (cond == "every_day")
+                                curPlace->addCondition(CustomPlace::Condition::EVERY_DAY);
+                            else
+                                throw std::runtime_error("Incorrect condition.");
+                        }
+                    }
+
+                    if (objJson["custom"].count("days")) {
+                        for (uint day : objJson["custom"]["days"]) {
+                            curPlace->addDay(day);
+                        }
+                    }
+
+                    place = curPlace;
+                } else
+                    place = std::make_shared<PlaceWithMixedTimetable>(coords, timeToGet, id);
 
                 for (size_t dayOfWeek = 0; dayOfWeek < DAYS_IN_WEEK; dayOfWeek++) {
                     if (objJson["timetable"].count(DAYS_OF_WEEK_STR[dayOfWeek])) {

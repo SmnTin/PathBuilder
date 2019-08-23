@@ -69,6 +69,33 @@ namespace pbuilder {
                     _resultedMat->at(i, j) = _matrices[_matrices[numberOfTransports]->at(i, j)]->at(i, j);
                 }
             }
+
+            for (auto &placeFrom : _places)
+                for (auto &placeTo : _places)
+                    if (placeFrom != placeTo) {
+                        if (placeFrom->custom() && !placeTo->custom()) {
+                            auto placeFromCasted = std::dynamic_pointer_cast<CustomPlace>(placeFrom);
+
+                            if (placeFromCasted->hasCondition(CustomPlace::Condition::DAY_START))
+                                _resultedMat->at(placeTo->id, placeFrom->id) = INF;
+                        } else if (placeFrom->custom() && placeTo->custom()) {
+                            auto placeFromCasted = std::dynamic_pointer_cast<CustomPlace>(placeFrom);
+                            auto placeToCasted = std::dynamic_pointer_cast<CustomPlace>(placeTo);
+
+                            if (placeFromCasted->hasCondition(CustomPlace::Condition::DAY_START) &&
+                                !placeToCasted->hasCondition(CustomPlace::Condition::DAY_START))
+                                _resultedMat->at(placeTo->id, placeFrom->id) = INF;
+
+                            if (!placeFromCasted->hasCondition(CustomPlace::Condition::DAY_END) &&
+                                placeToCasted->hasCondition(CustomPlace::Condition::DAY_END))
+                                _resultedMat->at(placeTo->id, placeFrom->id) = INF;
+                        } else if (!placeFrom->custom() && placeTo->custom()) {
+                            auto placeToCasted = std::dynamic_pointer_cast<CustomPlace>(placeTo);
+
+                            if (placeToCasted->hasCondition(CustomPlace::Condition::DAY_END))
+                                _resultedMat->at(placeTo->id, placeFrom->id) = INF;
+                        }
+                    }
         }
 
         //the "core" function. It calculates an optimal route through all given vertices;
@@ -177,6 +204,18 @@ namespace pbuilder {
             return block;
         }
 
+        bool _satisfiedAllCriticalPlaces(uint day) {
+            for (auto &_place : _places) {
+                auto place = std::dynamic_pointer_cast<CustomPlace>(_place);
+
+                if (place && place->hasOverDay(day)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         Result _calcResult() {
             //TODO: impl2
             return _calcResultImpl1();
@@ -187,11 +226,11 @@ namespace pbuilder {
 
             uint dayOfWeek = _dayOfWeek, day = 0;
             std::queue<int>
-                    toVisit = _orderedPlaces(dayOfWeek),
+                    toVisit = _orderedPlaces(day, dayOfWeek),
                     visited;
 
-            while (!toVisit.empty()) {
-                toVisit = _orderedPlaces(toVisit, dayOfWeek);
+            while (!toVisit.empty() || !_satisfiedAllCriticalPlaces(day)) {
+                toVisit = _orderedPlaces(toVisit, day, dayOfWeek);
 
                 std::vector<int> places;
                 int mask = 0;
@@ -245,39 +284,56 @@ namespace pbuilder {
             return result;
         }
 
-        std::queue<int> _orderedPlaces(std::vector<int> pts, size_t dayOfWeek) {
-            std::vector<std::tuple<int, double, int>> order;
+        std::queue<int> _orderedPlaces(std::vector<int> pts, uint day, uint dayOfWeek) {
+            std::vector<std::tuple<bool, int, double, int>> order;
             std::queue<int> result;
 
+            std::vector<bool> placesUsed(_places.size(), false);
             for (size_t i = 0; i < pts.size(); ++i) {
-                order.emplace_back(_places[pts[i]]->daysOfWeekComparator(dayOfWeek, (dayOfWeek + 1) % DAYS_IN_WEEK),
+                placesUsed[pts[i]] = true;
+            }
+            for (size_t i = 0; i < _places.size(); ++i)
+                if (!placesUsed[i] && _places[i]->critical(day))
+                    pts.push_back(i);
+
+            size_t criticalPlacesCnt = 0;
+            for (size_t i = 0; i < pts.size(); ++i) {
+                criticalPlacesCnt += _places[pts[i]]->critical(day);
+
+                if (!_places[pts[i]]->critical(day) && _places[pts[i]]->custom())
+                    continue;
+
+                order.emplace_back(!_places[pts[i]]->critical(day),
+                                   _places[pts[i]]->daysOfWeekComparator(dayOfWeek, (dayOfWeek + 1) % DAYS_IN_WEEK),
                                    distance(_places[pts[i]]->coords, _coordinates), pts[i]);
             }
+            if (criticalPlacesCnt > PATH_BUILDER_MAX_BLOCK_SIZE)
+                throw std::runtime_error("Too many custom places.");
 
             std::sort(order.begin(), order.end());
 
-            for (size_t i = 0; i < pts.size(); ++i)
-                result.push(std::get<2>(order[i]));
+            for (size_t i = 0; i < order.size(); ++i)
+                result.push(std::get<3>(order[i]));
 
             return result;
         }
 
-        std::queue<int> _orderedPlaces(std::queue<int> ptsq, size_t dayOfWeek) {
+        std::queue<int> _orderedPlaces(std::queue<int> ptsq, uint day, uint dayOfWeek) {
             std::vector<int> pts;
             while (!ptsq.empty()) {
                 pts.push_back(ptsq.front());
                 ptsq.pop();
             }
 
-            return _orderedPlaces(pts, dayOfWeek);
+            return _orderedPlaces(pts, day, dayOfWeek);
         }
 
-        std::queue<int> _orderedPlaces(size_t dayOfWeek) {
+        std::queue<int> _orderedPlaces(uint day, uint dayOfWeek) {
             std::vector<int> pts;
             for (size_t i = 0; i < _places.size(); ++i)
                 pts.push_back(i);
 
-            return _orderedPlaces(pts, dayOfWeek);
+            return _orderedPlaces(pts, day, dayOfWeek);
         }
 
     };

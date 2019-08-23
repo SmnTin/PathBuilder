@@ -25,11 +25,21 @@ namespace pbuilder {
     public:
         typedef int Id;
 
+        Place();
+
+        Place(const Coordinates &coords_,
+              const TimePoint &timeToGet_,
+              Id id_ = 0);
+
         Coordinates coords;
         TimePoint timeToGet;
         Id id;
 
         virtual bool visitable(TimePoint dayStart, TimePoint dayEnd) const = 0;
+
+        virtual bool critical(uint day) const = 0;
+
+        virtual bool custom() const = 0;
 
         //get nearest existing interval right after certain time point
         virtual Interval nearestTime(const TimePoint &timePoint, size_t dayOfWeek) const = 0;
@@ -78,6 +88,10 @@ namespace pbuilder {
                                 const TimePoint &timeToGet_,
                                 Id id_ = 0);
 
+        bool custom() const override;
+
+        bool critical(uint day) const override;
+
         void addTimetableElement(ShPtr<TimetableElement> element, size_t dayOfWeek);
 
         bool visitable(TimePoint dayStart, TimePoint dayEnd) const override;
@@ -90,6 +104,38 @@ namespace pbuilder {
 
     private:
         std::vector<std::vector<ShPtr<TimetableElement>>> _timetable;
+    };
+
+    class CustomPlace : public PlaceWithMixedTimetable {
+    public:
+        CustomPlace();
+
+        CustomPlace(const Coordinates &coords_,
+                    const TimePoint &timeToGet_,
+                    Id id_ = 0);
+
+        bool custom() const override;
+
+        bool critical(uint day) const override;
+
+        enum Condition {
+            EVERY_DAY,
+            DAY_START,
+            DAY_END,
+            CONDITIONS_COUNT = DAY_END + 1
+        };
+
+        virtual void addCondition(Condition condition);
+
+        virtual bool hasCondition(Condition condition) const;
+
+        virtual void addDay(uint day);
+
+        virtual bool hasOverDay(uint day);
+
+    protected:
+        bool _conditions[CONDITIONS_COUNT] = {false};
+        std::vector<uint> _days;
     };
 
 } //pbuilder

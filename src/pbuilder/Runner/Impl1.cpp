@@ -44,11 +44,33 @@ namespace pbuilder {
                 for (auto &placeVisited : block->order) {
                     filteredPlaces.push_back(parsedInput.places[placeVisited->id]);
                 }
+
+                //check that every custom place was used in the day
+                for (auto &place : parsedInput.places) {
+                    if (!place->critical(block->day))
+                        continue;
+
+                    bool found = false;
+                    for (auto &placeVisited : block->order) {
+                        if (placeVisited->id == place->id) {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (!found)
+                        throw std::runtime_error("Not every custom place can be used.");
+                }
+
                 pathCompleter->setPlaces(filteredPlaces);
                 pathCompleter->setDayOfWeek(block->dayOfWeek);
                 pathCompleter->setDay(block->day);
 
-                block = pathCompleter->check().block;
+                auto completerResult = pathCompleter->check();
+                if (!completerResult.possible)
+                    throw std::runtime_error("Desired combination is not possible!");
+
+                block = completerResult.block;
             }
             return OutputGeneratorFullMode::create(output);
         }
