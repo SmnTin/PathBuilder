@@ -24,6 +24,7 @@ namespace pbuilder {
     class Place {
     public:
         typedef int Id;
+        typedef std::string OriginalId;
 
         Place();
 
@@ -34,6 +35,8 @@ namespace pbuilder {
         Coordinates coords;
         TimePoint timeToGet;
         Id id;
+        OriginalId originalId;
+
 
         virtual bool visitable(TimePoint dayStart, TimePoint dayEnd) const = 0;
 

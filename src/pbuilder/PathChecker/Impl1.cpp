@@ -89,6 +89,7 @@ namespace pbuilder {
                 ShPtr<PlaceVisited> place = std::make_shared<PlaceVisited>();
                 place->interval = interval;
                 place->id = _places[i]->id;
+                place->originalId = _places[i]->originalId;
 
                 result.block->order.push_back(place);
                 result.block->price += interval.price;

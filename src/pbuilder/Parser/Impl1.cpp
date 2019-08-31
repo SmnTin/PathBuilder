@@ -133,6 +133,8 @@ namespace pbuilder {
                     }
                 }
 
+                place->originalId = objJson["original_id"];
+
                 res.push_back(place);
                 ++ind;
             }

@@ -19,7 +19,9 @@ namespace pbuilder {
 
         struct PlaceVisited {
             typedef Place::Id Id;
+            typedef Place::OriginalId OriginalId;
             Id id = 0;
+            OriginalId originalId = "";
             Interval interval;
             std::vector<Transport> transports;
             uint chosenTransport = 0;

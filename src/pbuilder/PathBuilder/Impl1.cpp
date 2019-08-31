@@ -185,6 +185,7 @@ namespace pbuilder {
 
                     place->interval = p_interval[cur_mask][cur_i];
                     place->id = _places[pts[cur_i]]->id;
+                    place->originalId = _places[pts[cur_i]]->originalId;
 
                     block->price += place->interval.price;
 

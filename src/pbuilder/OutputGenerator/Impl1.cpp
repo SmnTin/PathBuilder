@@ -14,6 +14,7 @@ namespace pbuilder {
         for (auto &place : block->order) {
             nlohmann::json jplace;
             jplace["id"] = place->id;
+            jplace["original_id"] = place->originalId;
             jplace["starts"] = place->interval.starts.toString();
             jplace["lasts"] = place->interval.lasts.toString();
             jplace["price"] = place->interval.price;
