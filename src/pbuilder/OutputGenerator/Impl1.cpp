@@ -21,11 +21,13 @@ namespace pbuilder {
 
 //            jplace["transports"] = nlohmann::json::object();
 
+            jplace["chosen_transport"] = place->chosenTransport;
             for (size_t i = 0; i < place->transports.size(); ++i) {
-                jplace["transports"][std::to_string(i)]["possible"] = place->transports[i].possible;
-                jplace["transports"][std::to_string(i)]["takes"] = place->transports[i].takesMinutes;
-                jplace["transports"][std::to_string(i)]["time_left"] = place->transports[i].timeLeftMinutes;
-                jplace["transports"][std::to_string(i)]["cost"] = place->transports[i].cost;
+                std::string ind = std::to_string(i);
+                jplace["transports"][ind]["possible"] = place->transports[i].possible;
+                jplace["transports"][ind]["takes"] = place->transports[i].takesMinutes;
+                jplace["transports"][ind]["time_left"] = place->transports[i].timeLeftMinutes;
+                jplace["transports"][ind]["cost"] = place->transports[i].cost;
             }
 
             jday["places"].push_back(jplace);

@@ -4,6 +4,8 @@
 
 using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
 
+//#define DEBUG
+
 int main() {
     HttpServer server;
     server.config.port = 9005;
@@ -14,12 +16,16 @@ int main() {
 
     server.resource["^/$"]["POST"] = [runner](std::shared_ptr<HttpServer::Response> response,
                                               std::shared_ptr<HttpServer::Request> request) {
+#ifndef DEBUG
         try {
+#endif
             response->write(runner->run(request->content.string()));
+#ifndef DEBUG
         }
         catch (const std::exception &e) {
             response->write(SimpleWeb::StatusCode::client_error_bad_request, e.what());
         }
+#endif
     };
 
     server.on_error = [](std::shared_ptr<HttpServer::Request> /*request*/, const SimpleWeb::error_code & /*ec*/) {

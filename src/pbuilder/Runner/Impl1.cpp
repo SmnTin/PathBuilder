@@ -58,8 +58,8 @@ namespace pbuilder {
                         }
                     }
 
-                    if (!found)
-                        throw std::runtime_error("Not every custom place can be used.");
+//                    if (!found)
+//                        throw std::runtime_error("Not every custom place can be used.");
                 }
 
                 pathCompleter->setPlaces(filteredPlaces);
