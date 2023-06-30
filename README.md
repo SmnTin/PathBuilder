@@ -1,5 +1,5 @@
 # Path Builder project
-The algorithm of finding optimal route through all  the given points was implemented in this project, in other words, traveling salesman problem.It was designed for the Unwayl app to build optimal routes through real places with given timetable. It uses DP with subsets to build path inside the day and a greedy solution for building the whole week. This algorithm works under the http-interface, and also it both gets requests and gives responses in the JSON-format.
+The service for solving an instance of travelling salesman problem. The task is to find through all the given places the optimal route that respects all the timing requirements. We use dynamic programming with subsets to build the path inside the day and a greedy algorithm to build the path for the whole week. The service exposes REST API endpoint.
 
 ## Getting started
 ### Dependencies
@@ -8,7 +8,7 @@ The algorithm of finding optimal route through all  the given points was impleme
 - [Simple-Web-Server](https://gitlab.com/eidheim/Simple-Web-Server) for the http-interface implementation
 
 ### Prerequisites
-However, **Google Test** and **Simple-Web-Server** will be installed automatically, Boost.Asio will not. So do it manually.
+While **Google Test** and **Simple-Web-Server** are installed automatically, Boost.Asio is not. You can do it manually.
 For instance, on Ubuntu/Debian type the following into the terminal :
 ```bash
 sudo apt-get install libboost-all-dev
